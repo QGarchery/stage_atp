@@ -1,0 +1,63 @@
+\title{Stage de M2 MPRI: Démonstration automatique en Coq}
+
+\section{Introduction}
+Assistants de preuves 
+Automatisation 
+lien SAT
+
+\newpage
+
+
+
+\section{Intégration de solver SAT/SMT en Coq}
+
+\subsection{Introduction}
+\subsubsection{SAT/SMT}
+SMTcoq fonctionne sur un sous ensemble de formules coq :
+Ces formules sont en forme prénexe et sur un domaine décidable.
+
+\subsection{fonctionnement de smtcoq}
+La première étape est la réification. Il s'agit de transformer une formule coq en un AST:
+ce n'est faisable que dans un autre langage que Coq, ici Ocaml.
+Cet AST est ensuite envoyé à un prouveur smt, qui nous donne un certificat de preuve.
+Il s'agit ensuite de rejouer ce certificat en coq. Il faut pour cela l'interprété: création
+de tables qui permettent d'exprimer ce certificat, la formule, les sous-formules apparaissant
+dans le certificat, les atomes, les lemmes utilisés. Il y a aussi une étape d'adaptation de ces
+certificats: il peut manquer des étapes, la forme n'est pas la même que la notre ...
+
+\subsection{fonctionnement d'un smt solver}
+cnf : conjonction de clauses
+clause : disjonction de litéraux
+literal : atom ou negation d'atome
+atome : ensemble (fini?) fixé
+on peut voir les lemmes de la théorie comme des atomes. Ils sont utilisés par les prouveurs.
+fonctionnement d'un smt prouveur :
+-faire sat sur la formule en considérant les atomes comme indéfinis
+-en déduire une instantiation qui marche, sinon renvoyer unsat
+-envoyer cette instantiation aux prouveurs
+-si tous les prouveurs renvoient vrai alors c'est sat
+-sinon les prouveurs donnent un lemme additionnel
+-rajouter ce lemme et recommencer (il y a un nombre fini d'instanciation des atomes)
+
+\subsection{Certificats et small checker}
+Un certificat est une liste de certif * position suivi d'une position finale.
+Un certif est un type somme de scertif.
+Un schecker prend un scertif et calcule une nouvelle formule (il faut lui doner l'état aussi).
+Le checker sera simplement la combinaison par filtrage de ces schecker.
+Pour vérifier que le certificat est correct, il faut appliquer dans l'ordre checker sur
+chacun des certif et modifier la position correspondant à ce certif à chaque étape.
+Il faut à la toute fin vérifier que la position finale dans l'état est la clause vide.
+
+\subsection{Exemples de certificats et de vérificateurs}
+\subsubsection{resolution chains}
+
+
+
+
+\subsubsection{nor\_certif}
+\subsubsection{congruence theory}
+
+
+
+
+\end{document}
