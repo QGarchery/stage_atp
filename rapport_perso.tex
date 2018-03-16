@@ -50,13 +50,15 @@ Il faut à la toute fin vérifier que la position finale dans l'état est la cla
 
 \subsection{Exemples de certificats et de vérificateurs}
 \subsubsection{resolution chains}
-
-
-
+C'est simplement une liste de clause.
+Le schecker associé fait un fold dessus en appliquant la regle de resolution dessus. Cette regle est
+refutationnellement complete.
 
 \subsubsection{nor\_certif}
-\subsubsection{congruence theory}
+Il implémente la regle ~(A1 \/ A2 \/ ... \/ An) => ~Ai
 
+\subsubsection{congruence theory}
+Qui implémente les regles de transitivité et de congruence.
 
 
 
