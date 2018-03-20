@@ -1,14 +1,72 @@
+@TECHREPORT{BarFT-RR-17,
+  author =	 {Clark Barrett and Pascal Fontaine and Cesare Tinelli},
+  title =	 {{The SMT-LIB Standard: Version 2.6}},
+  institution =	 {Department of Computer Science, The University of Iowa},
+  year =	 2017,
+  note =	 {Available at {\tt www.SMT-LIB.org}}
+}
+@Comment Donne le format et la sémantique attendue des .smt2.
+
+@InProceedings{10.1007/978-3-642-25379-9_12,
+author="Armand, Michael
+and Faure, Germain
+and Gr{\'e}goire, Benjamin
+and Keller, Chantal
+and Th{\'e}ry, Laurent
+and Werner, Benjamin",
+editor="Jouannaud, Jean-Pierre
+and Shao, Zhong",
+title="A Modular Integration of SAT/SMT Solvers to Coq through Proof Witnesses",
+booktitle="Certified Programs and Proofs",
+year="2011",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="135--150",
+abstract="We present a way to enjoy the power of SAT and SMT provers in Coq without compromising soundness. This requires these provers to return not only a yes/no answer, but also a proof witness that can be independently rechecked. We present such a checker, written and fully certified in Coq. It is conceived in a modular way, in order to tame the proofs' complexity and to be extendable. It can currently check witnesses from the SAT solver ZChaff and from the SMT solver veriT. Experiments highlight the efficiency of this checker. On top of it, new reflexive Coq tactics have been built that can decide a subset of Coq's logic by calling external provers and carefully checking their answers.",
+isbn="978-3-642-25379-9"
+}
+@Comment Explication de la théorie et du code de SMTCoq.
+
+@article{DBLP:journals/jacm/NieuwenhuisOT06,
+author    = {Robert Nieuwenhuis and Albert Oliveras and Cesare Tinelli},
+title     = {Solving {SAT} and {SAT} Modulo Theories: From an abstract Davis--Putnam--Logemann--Loveland
+             procedure to DPLL(\emph{T})},
+journal   = {J. {ACM}},
+volume    = {53},
+number    = {6},
+pages     = {937--977},
+year      = {2006},
+url       = {http://doi.acm.org/10.1145/1217856.1217859},
+doi       = {10.1145/1217856.1217859},
+timestamp = {Wed, 14 Jun 2017 20:31:33 +0200},
+biburl    = {https://dblp.org/rec/bib/journals/jacm/NieuwenhuisOT06},
+bibsource = {dblp computer science bibliography, https://dblp.org}}
+@Comment Explication du fonctionnement d'un prouveur SAT.
+
+@inproceedings{jouannaud:inria-00516906,
+title = {{Certification of SAT Solvers in Coq}},
+author = {Jouannaud, Jean-Pierre and Strub, Pierre-Yves and Zhang, Lianyi},
+url = {https://hal.inria.fr/inria-00516906},
+booktitle = {{Guangzhou Symposium on Satisfiability in Logic-Based Modeling}},
+address = {Zuhai, China},
+organization = {{Yuping Shen, Institute of Logic and Cognition Sun Yat-sen University, Guangzhou.}},
+series = {Proc. Guangzhou Symposium on Satisfiability in Logic-Based Modeling},
+year = {2010},
+month = Sep,
+pdf = {https://hal.inria.fr/inria-00516906/file/main.pdf},
+hal_id = {inria-00516906},
+hal_version = {v1},}
+@Comment Description du format d'entrée et des certificats de Zchaff.
+
 @phdthesis{DBLP:phd/hal/Lescuyer11,
-  author    = {St{\'{e}}phane Lescuyer},
-    title     = {Formalizing and Implementing a Reflexive Tactic for Automated Deduction
-                   in Coq. (Formalisation et developpement d'une tactique reflexive pour
+author    = {St{\'{e}}phane Lescuyer},
+title     = {Formalizing and Implementing a Reflexive Tactic for Automated Deduction
+             in Coq. (Formalisation et developpement d'une tactique reflexive pour
 		                  la demonstration automatique en coq)},
-				    school    = {University of Paris-Sud, Orsay, France},
-				      year      = {2011},
-				        url       = {https://tel.archives-ouvertes.fr/tel-00713668},
-					  timestamp = {Mon, 11 Jul 2016 18:16:19 +0200},
-					    biburl    = {https://dblp.org/rec/bib/phd/hal/Lescuyer11},
-					      bibsource = {dblp computer science bibliography, https://dblp.org}
-
-
-%% Thèse d'un ancien membre du LRI, qui a montré en Coq la correction d'un prouveur SMT avec la théorie EUF
+school    = {University of Paris-Sud, Orsay, France},
+year      = {2011},
+url       = {https://tel.archives-ouvertes.fr/tel-00713668},
+timestamp = {Mon, 11 Jul 2016 18:16:19 +0200},
+biburl    = {https://dblp.org/rec/bib/phd/hal/Lescuyer11},
+bibsource = {dblp computer science bibliography, https://dblp.org}
+@Comment Thèse d'un ancien membre du LRI, qui a montré en Coq la correction d'un prouveur SMT avec la théorie EUF.

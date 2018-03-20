@@ -287,7 +287,6 @@ Section dpll.
     
 End dpll.
 
-
 Print transition.
 
 
@@ -308,24 +307,5 @@ Qed.
 
     
 
-  
-  
-
-      
-
-  
-  
-
-  
-
-  
-
-  
-  
-  
     
-
-    
-
-  
   
