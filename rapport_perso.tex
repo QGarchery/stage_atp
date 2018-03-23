@@ -62,4 +62,27 @@ Qui implémente les regles de transitivité et de congruence.
 
 
 
+\section{veriT et zChaff}
+Les certificats de zChaff:
+-maintiennent un état des variables
+-donnent un ordre d'execution (L : 2)
+-définissent des clauses apprises au début du fichier par résolution
+-définissent des commandes fixant la valeur d'une variable (Var : 5) à vrai (V : 1) ou faux (V : 0)
+-définissent une clause de conflit (qui explicite les litéraux de conflit)
+
+Il y a différentes stratégies pour l'implémentation de dpll, on peut choisir de donner une priorité
+plus importante à la théorie ou aux solveur SAT, à plusieurs niveaux, priorité des regles de Basic dpll. 
+
+La résolution de deux clauses utilise une dérivée de la fonction merge de merge sort.
+
+La preuve par réflection utilise le principe d'égalité calculatoire de Coq: deux termes sont
+toujours considérés à beta-red près. Attention : les définitions inductives ne définissent pas
+de regles calculatoires additionnelles alors que Definition et Fixpoint si.
+
+
+
+
+
+
+
 \end{document}
