@@ -80,7 +80,30 @@ toujours considérés à beta-red près. Attention : les définitions inductives
 de regles calculatoires additionnelles alors que Definition et Fixpoint si.
 
 
+\section{preprocessing du certificat de veriT pour forall_inst}
 
+Afin de ne pas avoir à rajouter des binders dans les proof witness de veriT, nous avons choisi de faire un
+preprocessing dans les certificats renvoyés par veriT.
+Les règles instance apparaissent sous la forme suivante :
+     (forall_inst (or (not lemma) lemma_inst) id)
+où lemma est un des lemmes rajoutés par l'utilisateur et lemma_inst est une instance de ce même lemme.
+
+Pour chacune de ces règles instances, on garde une trace du lemme auquel elle se réfère puis on modifie la valeur
+de cette règle: ce n'est plus (or (not lemma) lemma_inst) mais seulement (lemma_inst). En contrepartie, les règles
+de résolution qui utilisent à la fois une de ces règles instances et le lemme associé sont réduites à seulement
+l'instance du lemme.
+
+Exemple :
+si on a ensuite
+(resolution (thm) id1 id2 id3)
+et que id2 donne la règle instance écrite ci-dessus et que id3 donne la règle
+(input (lemma))
+alors on remplace cette règle résolution par une règle de résolution ayant id1 et id2.
+
+On a fait également attention au fait que les règles temporaires de veriT donnent des alias des lemmes de départ
+et qu'après une règle forall_inst il y a une règle qui transforme le OR interne en OR externe.
+
+\section
 
 
 
