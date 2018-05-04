@@ -14,7 +14,8 @@ Section Relation.
   | nex a b c : star_right a b ->
                 R b c ->
                 star_right a c.
-  
+
+
   Lemma star_right_star a b:
         star_right a b ->
         star a b.
