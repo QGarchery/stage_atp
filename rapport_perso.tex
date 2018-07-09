@@ -20,7 +20,7 @@ Ces formules sont en forme prénexe et sur un domaine décidable.
 La première étape est la réification. Il s'agit de transformer une formule coq en un AST:
 ce n'est faisable que dans un autre langage que Coq, ici Ocaml.
 Cet AST est ensuite envoyé à un prouveur smt, qui nous donne un certificat de preuve.
-Il s'agit ensuite de rejouer ce certificat en coq. Il faut pour cela l'interprété: création
+Il s'agit ensuite de rejouer ce certificat en coq. Il faut pour cela l'interpréter: création
 de tables qui permettent d'exprimer ce certificat, la formule, les sous-formules apparaissant
 dans le certificat, les atomes, les lemmes utilisés. Il y a aussi une étape d'adaptation de ces
 certificats: il peut manquer des étapes, la forme n'est pas la même que la notre ...
@@ -28,13 +28,13 @@ certificats: il peut manquer des étapes, la forme n'est pas la même que la not
 \subsection{fonctionnement d'un smt solver}
 cnf : conjonction de clauses
 clause : disjonction de litéraux
-literal : atom ou negation d'atome
+littéral : atome ou négation d'atome
 atome : ensemble (fini?) fixé
 on peut voir les lemmes de la théorie comme des atomes. Ils sont utilisés par les prouveurs.
 fonctionnement d'un smt prouveur :
 -faire sat sur la formule en considérant les atomes comme indéfinis
--en déduire une instantiation qui marche, sinon renvoyer unsat
--envoyer cette instantiation aux prouveurs
+-en déduire une intanciation qui marche, sinon renvoyer unsat
+-envoyer cette intanciation aux prouveurs
 -si tous les prouveurs renvoient vrai alors c'est sat
 -sinon les prouveurs donnent un lemme additionnel
 -rajouter ce lemme et recommencer (il y a un nombre fini d'instanciation des atomes)
@@ -51,33 +51,33 @@ Il faut à la toute fin vérifier que la position finale dans l'état est la cla
 \subsection{Exemples de certificats et de vérificateurs}
 \subsubsection{resolution chains}
 C'est simplement une liste de clause.
-Le schecker associé fait un fold dessus en appliquant la regle de resolution dessus. Cette regle est
-refutationnellement complete.
+Le schecker associé fait un fold dessus en appliquant la règle de resolution dessus. Cette règle est
+refutationnellement complète.
 
 \subsubsection{nor\_certif}
-Il implémente la regle ~(A1 \/ A2 \/ ... \/ An) => ~Ai
+Il implémente la règle ~(A1 \/ A2 \/ ... \/ An) => ~Ai
 
 \subsubsection{congruence theory}
-Qui implémente les regles de transitivité et de congruence.
+Qui implémente les règles de transitivité et de congruence.
 
 
 
 \section{veriT et zChaff}
 Les certificats de zChaff:
 -maintiennent un état des variables
--donnent un ordre d'execution (L : 2)
+-donnent un ordre d'exécution (L : 2)
 -définissent des clauses apprises au début du fichier par résolution
 -définissent des commandes fixant la valeur d'une variable (Var : 5) à vrai (V : 1) ou faux (V : 0)
--définissent une clause de conflit (qui explicite les litéraux de conflit)
+-définissent une clause de conflit (qui explicite les littéraux de conflit)
 
-Il y a différentes stratégies pour l'implémentation de dpll, on peut choisir de donner une priorité
-plus importante à la théorie ou aux solveur SAT, à plusieurs niveaux, priorité des regles de Basic dpll. 
+Il y a différentes stratégies pour l'implantation de dpll, on peut choisir de donner une priorité
+plus importante à la théorie ou aux solveur SAT, à plusieurs niveaux, priorité des règles de Basic dpll. 
 
 La résolution de deux clauses utilise une dérivée de la fonction merge de merge sort.
 
 La preuve par réflection utilise le principe d'égalité calculatoire de Coq: deux termes sont
 toujours considérés à beta-red près. Attention : les définitions inductives ne définissent pas
-de regles calculatoires additionnelles alors que Definition et Fixpoint si.
+de règles calculatoires additionnelles alors que Definition et Fixpoint si.
 
 
 \section{preprocessing du certificat de veriT pour forall_inst}
