@@ -5,7 +5,7 @@ Inductive AndTree :=
 | Bool (_ : bool).
 
 Inductive Evaluation : AndTree -> bool -> Prop :=
-| EvalBool b :
+  EvalBool b :
     Evaluation (Bool b) b
 | EvalAnd b1 b2 b3 t1 t2 :
     Evaluation t1 b1 -> Evaluation t2 b2 -> b1 && b2 = b3 ->
@@ -24,11 +24,11 @@ Qed.
   
 Fixpoint evaluation (t : AndTree) :=
   match t with
-  | And t1 t2 => evaluation t1 && evaluation t2
+    And t1 t2 => evaluation t1 && evaluation t2
   | Bool n => n 
   end.
 
-Lemma evaluation_t_false : evaluation t = false.
+Lemma eval_t_false : evaluation t = false.
 Proof.
   reflexivity.
 Qed.

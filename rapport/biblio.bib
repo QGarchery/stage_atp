@@ -1,0 +1,196 @@
+@incollection{coq_intro,
+TITLE = {{Introduction to the Calculus of Inductive Constructions}},
+AUTHOR = {Paulin-Mohring, Christine},
+URL = {https://hal.inria.fr/hal-01094195},
+BOOKTITLE = {{All about Proofs, Proofs for All}},
+EDITOR = {Bruno Woltzenlogel Paleo and David Delahaye},
+PUBLISHER = {{College Publications}},
+SERIES = {Studies in Logic (Mathematical logic and foundations)},
+VOLUME = {55},
+YEAR = {2015},
+MONTH = Jan,
+KEYWORDS = {Coq proof assistant ; Calculus of Inductive Constructions},
+PDF = {https://hal.inria.fr/hal-01094195/file/CIC.pdf},
+HAL_ID = {hal-01094195},
+HAL_VERSION = {v1}}
+# Une introduction au CIC de Coq
+
+@TECHREPORT{smtlib,
+  author =	 {Clark Barrett and Pascal Fontaine and Cesare Tinelli},
+  title =	 {{The SMT-LIB Standard: Version 2.6}},
+  institution =	 {Department of Computer Science, The University of Iowa},
+  year =	 2017,
+  note =	 {Available at {\tt www.SMT-LIB.org}}}
+# Donne le format et la sémantique attendue des .smt2.
+
+@InProceedings{smtcoq_code,
+author="Armand, Michael
+and Faure, Germain
+and Gr{\'e}goire, Benjamin
+and Keller, Chantal
+and Th{\'e}ry, Laurent
+and Werner, Benjamin",
+editor="Jouannaud, Jean-Pierre
+and Shao, Zhong",
+title="A Modular Integration of SAT/SMT Solvers to Coq through Proof Witnesses",
+booktitle="Certified Programs and Proofs",
+year="2011",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="135--150",
+abstract="We present a way to enjoy the power of SAT and SMT provers in Coq without compromising soundness. This requires these provers to return not only a yes/no answer, but also a proof witness that can be independently rechecked. We present such a checker, written and fully certified in Coq. It is conceived in a modular way, in order to tame the proofs' complexity and to be extendable. It can currently check witnesses from the SAT solver ZChaff and from the SMT solver veriT. Experiments highlight the efficiency of this checker. On top of it, new reflexive Coq tactics have been built that can decide a subset of Coq's logic by calling external provers and carefully checking their answers.",
+isbn="978-3-642-25379-9"}
+# Explication de la théorie et du code de SMTCoq.
+
+@article{dpll,
+author    = {Robert Nieuwenhuis and Albert Oliveras and Cesare Tinelli},
+title     = {Solving {SAT} and {SAT} Modulo Theories: From an abstract Davis--Putnam--Logemann--Loveland
+             procedure to DPLL(\emph{T})},
+journal   = {J. {ACM}},
+volume    = {53},
+number    = {6},
+pages     = {937--977},
+year      = {2006},
+url       = {http://doi.acm.org/10.1145/1217856.1217859},
+doi       = {10.1145/1217856.1217859},
+timestamp = {Wed, 14 Jun 2017 20:31:33 +0200},
+biburl    = {https://dblp.org/rec/bib/journals/jacm/NieuwenhuisOT06},
+bibsource = {dblp computer science bibliography, https://dblp.org}}
+# Explication du fonctionnement d'un prouveur SAT.
+
+@inproceedings{zchaff_format,
+title = {{Certification of SAT Solvers in Coq}},
+author = {Jouannaud, Jean-Pierre and Strub, Pierre-Yves and Zhang, Lianyi},
+url = {https://hal.inria.fr/inria-00516906},
+booktitle = {{Guangzhou Symposium on Satisfiability in Logic-Based Modeling}},
+address = {Zuhai, China},
+organization = {{Yuping Shen, Institute of Logic and Cognition Sun Yat-sen University, Guangzhou.}},
+series = {Proc. Guangzhou Symposium on Satisfiability in Logic-Based Modeling},
+year = {2010},
+month = Sep,
+pdf = {https://hal.inria.fr/inria-00516906/file/main.pdf},
+hal_id = {inria-00516906},
+hal_version = {v1},}
+# Description du format d'entrée et des certificats de Zchaff.
+
+@phdthesis{smt_correction,
+author    = {St{\'{e}}phane Lescuyer},
+title     = {Formalizing and Implementing a Reflexive Tactic for Automated Deduction
+             in Coq. (Formalisation et developpement d'une tactique reflexive pour
+		                  la demonstration automatique en coq)},
+school    = {University of Paris-Sud, Orsay, France},
+year      = {2011},
+url       = {https://tel.archives-ouvertes.fr/tel-00713668},
+timestamp = {Mon, 11 Jul 2016 18:16:19 +0200},
+biburl    = {https://dblp.org/rec/bib/phd/hal/Lescuyer11},
+bibsource = {dblp computer science bibliography, https://dblp.org}}
+# Thèse d'un ancien membre du LRI, qui a montré en Coq la correction d'un prouveur SMT avec la théorie EUF.
+
+@inproceedings{native_array,
+author    = {Micha{\"{e}}l Armand and
+             Benjamin Gr{\'{e}}goire and
+             Arnaud Spiwack and
+             Laurent Th{\'{e}}ry},
+title     = {Extending Coq with Imperative Features and Its Application to {SAT}
+             Verification},
+booktitle = {Interactive Theorem Proving, First International Conference, {ITP}
+             2010, Edinburgh, UK, July 11-14, 2010. Proceedings},
+pages     = {83--98},
+year      = {2010},
+url       = {https://doi.org/10.1007/978-3-642-14052-5_8},
+doi       = {10.1007/978-3-642-14052-5_8},
+timestamp = {Sun, 04 Jun 2017 10:07:20 +0200},
+biburl    = {https://dblp.org/rec/bib/conf/itp/ArmandGST10},
+bibsource = {dblp computer science bibliography, https://dblp.org}}
+# Entiers et tableaux efficaces en Coq
+
+
+
+
+@techreport{ssreflect,
+title = {{A Small Scale Reflection Extension for the Coq system}},
+author = {Gonthier, Georges and Mahboubi, Assia and Tassi, Enrico},
+url = {https://hal.inria.fr/inria-00258384},
+type = {Research Report},
+number = {RR-6455},
+institution = {{Inria Saclay Ile de France}},
+year = {2016},
+pdf = {https://hal.inria.fr/inria-00258384/file/main.pdf},
+hal_id = {inria-00258384},
+hal_version = {v17},}
+
+
+
+@phdthesis{these_keller,
+  author    = {Chantal Keller},
+  title     = {A Matter of Trust: Skeptical Communication Between Coq and External
+               Provers. (Question de confiance : communication sceptique entre Coq
+               et des prouveurs externes)},
+  school    = {{\'{E}}cole Polytechnique, Palaiseau, France},
+  year      = {2013},
+  url       = {https://tel.archives-ouvertes.fr/pastel-00838322},
+  timestamp = {Tue, 28 Jun 2016 13:29:24 +0200},
+  biburl    = {https://dblp.org/rec/bib/phd/hal/Keller13},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{hol_selector,
+  author    = {Jasmin Christian Blanchette and
+               David Greenaway and
+               Cezary Kaliszyk and
+               Daniel K{\"{u}}hlwein and
+               Josef Urban},
+  title     = {A Learning-Based Fact Selector for Isabelle/HOL},
+  journal   = {J. Autom. Reasoning},
+  volume    = {57},
+  number    = {3},
+  pages     = {219--244},
+  year      = {2016},
+  url       = {https://doi.org/10.1007/s10817-016-9362-8},
+  doi       = {10.1007/s10817-016-9362-8},
+  timestamp = {Thu, 15 Jun 2017 21:22:45 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/jar/BlanchetteGKKU16},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{coqhammer,
+  author    = {Lukasz Czajka and
+               Cezary Kaliszyk},
+  title     = {Hammer for Coq: Automation for Dependent Type Theory},
+  journal   = {J. Autom. Reasoning},
+  volume    = {61},
+  number    = {1-4},
+  pages     = {423--453},
+  year      = {2018},
+  url       = {https://doi.org/10.1007/s10817-018-9458-4},
+  doi       = {10.1007/s10817-018-9458-4},
+  timestamp = {Tue, 26 Jun 2018 14:09:47 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/jar/CzajkaK18},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{compcert,
+  author    = {Xavier Leroy},
+  title     = {Formal verification of a realistic compiler},
+  journal   = {Commun. {ACM}},
+  volume    = {52},
+  number    = {7},
+  pages     = {107--115},
+  year      = {2009},
+  url       = {http://doi.acm.org/10.1145/1538788.1538814},
+  doi       = {10.1145/1538788.1538814},
+  timestamp = {Thu, 02 Jul 2009 13:36:32 +0200},
+  biburl    = {https://dblp.org/rec/bib/journals/cacm/Leroy09},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+
+@manual{sledgehammer_manual,
+title = {Hammering Away,
+A User’s Guide to Sledgehammer for Isabelle/HOL},
+author = {Christian Blanchette, Jasmin 
+and Paulson, Lawrence C.  },
+url = {https://isabelle.in.tum.de/dist/doc/sledgehammer.pdf},
+year = {2017},
+pdf = {https://isabelle.in.tum.de/dist/doc/sledgehammer.pdf},
+}
