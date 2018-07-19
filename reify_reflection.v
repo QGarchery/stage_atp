@@ -4,11 +4,34 @@ Inductive AndTree :=
   And (_ _: AndTree)
 | Bool (_ : bool).
 
-Fixpoint eval (t : AndTree) :=
+Inductive Evaluation : AndTree -> bool -> Prop :=
+| EvalBool b :
+    Evaluation (Bool b) b
+| EvalAnd b1 b2 b3 t1 t2 :
+    Evaluation t1 b1 -> Evaluation t2 b2 -> b1 && b2 = b3 ->
+    Evaluation (And t1 t2) b3.
+
+Definition t :=
+  And (And (Bool true) (Bool false)) (And (Bool true) (Bool true)).
+
+Lemma Eval_t_false : Evaluation t false.
+Proof.
+  eapply EvalAnd ; [
+    eapply EvalAnd ; [ apply EvalBool | apply EvalBool | reflexivity ]
+  | eapply EvalAnd ; [ apply EvalBool | apply EvalBool | reflexivity ]
+  | reflexivity ].
+Qed.
+  
+Fixpoint evaluation (t : AndTree) :=
   match t with
-  | And t1 t2 => eval t1 && eval t2
+  | And t1 t2 => evaluation t1 && evaluation t2
   | Bool n => n 
   end.
+
+Lemma evaluation_t_false : evaluation t = false.
+Proof.
+  reflexivity.
+Qed.
 
 Fixpoint append t1 t2 :=
   match t1 with
@@ -33,7 +56,7 @@ Inductive eqt : AndTree -> AndTree -> Prop :=
 | trans t1 t2 t3 : eqt t1 t2 -> eqt t2 t3 -> eqt t1 t3.
 
 Lemma eqt_is_eq t1 t2:
-  eqt t1 t2 -> eval t1 = eval t2.
+  eqt t1 t2 -> evaluation t1 = evaluation t2.
 Proof.
   intro eq12. induction eq12; simpl.
   -reflexivity.
@@ -73,8 +96,8 @@ Ltac peignify :=
   | [ |- ?A = ?B] =>
     let a := reify A in
     let b := reify B in
-    change A with (eval a);
-    change B with (eval b);
+    change A with (evaluation a);
+    change B with (evaluation b);
     rewrite (eqt_is_eq a _ (peigne_correct a));
     rewrite (eqt_is_eq b _ (peigne_correct b));
     simpl
