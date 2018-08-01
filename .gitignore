@@ -1,3 +1,6 @@
 *.out
 *.mli
 *.cmi
+*.cmo
+ejcp/*
+rapporteur/*
