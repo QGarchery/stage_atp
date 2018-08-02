@@ -50,8 +50,6 @@ sensitive=true,
 
 
 
-
-
 \begin{document}
 
 
@@ -107,7 +105,7 @@ Nous aimerions que le développement à l'aide de cette automatisation soit adap
 
 \subsection{Contribution proposée}
 
-Pendant mon stage, je me suis attaché à améliorer l'expressivité de SMTCoq de ce point de vue là. J'ai donc donné la possibilité à l'utilisateur de rajouter au contexte courant des lemmes (ou des axiomes) en forme prénexe. Ces lemmes sont ensuite traduits pour pouvoir être envoyés à un prouveur automatique. Ceux-ci fournissent alors un fichier de certificat et j'ai modifié la représentation SMTCoq de ces certificats pour y ajouter l'instanciation des lemmes. Cet aspect est original : la technique d'encodage des instanciations (\ref{processing_forallinst}) utilisée permet d'alléger la suite de la vérification. Enfin, j'ai automatisé l'instanciation de ces lemmes dans la preuve.
+Pendant mon stage, je me suis attaché à améliorer l'expressivité de SMTCoq de ce point de vue là. J'ai donc donné la possibilité à l'utilisateur de rajouter au contexte courant des lemmes (ou des axiomes) en forme prénexe. Ces lemmes sont ensuite traduits pour pouvoir être envoyés à un prouveur automatique. Ceux-ci fournissent alors un fichier de certificat et j'ai modifié la représentation SMTCoq de ces certificats pour y ajouter l'instanciation des lemmes. Cet aspect est original : la technique d'encodage des instanciations utilisée (\ref{processing_forallinst}) permet d'alléger la suite de la vérification. Enfin, j'ai automatisé l'instanciation de ces lemmes dans la preuve.
 
 
 \subsection{Arguments en faveur de la validité de la contribution}
@@ -296,7 +294,7 @@ Cette preuve a un contenu calculatoire : le calcul de la fonction $peigne$ sur l
 
 SMT-LIB est un langage qui a vocation à être un format d'entrée commun avec différents solveurs SMT qui sont un cas particulier des prouveurs automatiques, voir la section suivante. Ce langage offre un cadre commun pour faire des comparaison de solveurs SMT. La définition du langage \cite{smtlib} donne des indications sur la sémantique que doivent avoir certaines constructions du langage.\\
 
-Par exemple, pour le fichier texte $lia5.smt2$ suivant, les prouveurs automatiques doivent vérifier si il existe deux entiers $x$ et $y$ tels que $ ((x + y \leq -3 \wedge y \geq 0) \vee x \leq -3) \wedge x \geq 0$.
+Par exemple, pour le fichier texte $lia5.smt2$ suivant, les prouveurs automatiques doivent vérifier si il existe deux entiers $x$ et $y$ tels que $ ((x + y \leq -3 \wedge y \geq 0) \vee x \leq -3) \wedge x \geq 0$.    
 \begin{lstlisting}[frame=single]
 (set-logic QF_LIA)
 (declare-fun x () Int)
@@ -307,10 +305,21 @@ Par exemple, pour le fichier texte $lia5.smt2$ suivant, les prouveurs automatiqu
 \end{lstlisting}
 
 \subsection{Solveurs SMT} \label{smt}
-on peut voir les lemmes de la théorie comme des atomes. Ils sont utilisés par les prouveurs. \\
-Fonctionnement d'un smt prouveur :\\
--faire sat sur la formule en considérant les atomes comme indéfinis \\
--en déduire une intanciation qui marche, sinon renvoyer unsat \\
+
+Expliquons le fonctionnement d'une version simplifiée de l'algorithme DPLL \cite{dpll}. Nous ne considèrerons que la théorie LIA, c'est-à-dire qu'en plus des connecteurs logiques, la théorie contient les entiers et les symboles d'addition, de soustraction et d'inégalité. On prend en exemple la formule de la section précédente, à savoir : $((x + y \leq -3 \wedge y \geq 0) \vee x \leq -3) \wedge x \geq 0$. L'algorithme commence par identifier les sous-formules spécifique à la théorie LIA qu'on appelera atomes. Dans notre exemple cela revient à poser
+\begin{align*}
+  a &= (x + y \leq -3)\\
+  b &= (y \geq 0)\\
+  c &= (x \leq -3) \\
+  d &= (x \geq 0)
+\end{align*}
+et à chercher si la formule  $((a \wedge b) \vee c) \wedge d$ est satisfiable. Cette étape peut être suivie par une transformation de Tseitin (voir \ref{tseitin}) afin d'obtenir un problème en CNF. \\
+
+Ensuite l'algorithme DPLL répète les étapes suivantes :
+\begin{itemize}
+\item appeler un SAT-solveur sur l'ensemble des formules (dans l'exemple on commence avec une seule formule). Si ce n'est pas satisfiable alors l'algorithme répond que le problème n'est pas satisfiable. Sinon, le SAT-solveur donne une instanciation qui satisfait toutes les formules. Dans l'exemple, une telle instanciation pourrait être :
+  $a \wedge \overline{b} \wedge c \wedge d$
+\end{itemize}
 -envoyer cette intanciation aux prouveurs \\
 -si tous les prouveurs renvoient vrai alors c'est sat \\
 -sinon les prouveurs donnent un lemme additionnel \\
@@ -449,10 +458,13 @@ Cette interprétation passe par une étape intermédiare écrite en Ocaml qui d�
 
 
 
-\subsection{Transformation de Tseitin et Hash-consing}
+\subsection{Transformation de Tseitin et Hash-consing} \label{tseitin}
 
 -tables \\
--nouvelles variables
+-nouvelles variables\\
+Tseitin: exemple, transformation linéaire\\
+intérêt dans smtcoq : suivre fidèlement les certificat verit qui sont fait comme ça,
+optimisation
 
 \subsection{Certificat de verit}
 
