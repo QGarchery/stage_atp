@@ -239,7 +239,7 @@ Dans la suite, on s'intéresse au problème de mettre des formules booléennes c
 $ u = (b_1 \,\&\&\, b_2) \,\&\&\, (b_3 \,\&\&\, b4)$ \hspace{1cm} à   \hspace{1cm}  $u' = b_1 \,\&\&\, (b_2 \,\&\&\, (b_3 \,\&\&\, b4)). $
 \end{center}
 
-Pour cela, on a besoin de récupérer la structure du booléen $u$, c'est l'étape de réification. Il s'agit donc de construire, à partir de $u$, un terme du type $AndTree$ qui a la même structure que $u$. \\
+Pour cela, on a besoin de récupérer la structure du booléen $u$, c'est l'étape de réification. Il s'agit donc de construire, à partir de $u$, un terme du type $AndTree$ qui a la même structure que $u$.
 
 \subsubsection{Méthodes}
 Il n'est pas possible d'écrire en Coq une fonction qui détermine la forme conjonctive d'un argument booléen. En effet, le type $bool$ n'ayant que deux constructeurs ($true$ et $false$), inspecter par \textit{pattern-matching} nous donnera un de ces deux constructeurs.\\
@@ -376,6 +376,11 @@ SMTCoq a une approche sceptique de la vérification des prouveurs automatiques.
 
 \subsection{Fonctionnement de SMTCoq}
 
+\subsubsection{Passage à la négation du but} \label{negation}
+
+Les prouveurs automatiques fournissent un certificat uniquement dans le cas où le problème n'est pas satisfiable (\ref{smt}). Pour utiliser ce fonctionnement, SMTCoq envoie la négation du but au prouveur automatique. On s'attend alors à obtenir $unsat$. Si c'est le cas on a montré que la négation du but implique la clause vide. Autrement dit, on a une preuve de la double négation du but. SMTCoq ne traitant que les cas où les domaines des variables sont décidables, on récupère une preuve de but initial.
+
+
 \subsubsection{Amélioration de l'automatisation}
 
 SMTCoq définit des tactiques Coq, une par prouveur automatique : \textit{zchaff} et \textit{verit}. \\
@@ -390,7 +395,6 @@ Il s'agit ensuite de rejouer ce certificat en Coq, on utilise pour cela le véri
 
 Ces tactiques permettent à l'utilisateur Coq de profiter de l'automatisation de différents prouveurs.\\
 
-Les prouveurs automatiques fournissent un certificat uniquement dans le cas où le problème n'est pas satisfiable (\ref{smt}). Pour utiliser ce fonctionnement, SMTCoq envoie la négation du but au prouveur automatique. On s'attend alors à obtenir $unsat$. Si c'est le cas on a montré que la négation du but implique la clause vide. Autrement dit, on a une preuve de la double négation du but. SMTCoq ne traitant que les cas où les domaines des variables sont décidables, on récupère une preuve de but initial.
 
 
 \subsubsection{Amélioration de la confiance}
@@ -440,7 +444,7 @@ On notera que c'est bien la négation de la formule énoncée dans le fichier SM
 \newpage
 \section{Certificats et vérificateur}
 
-\subsection{Interpétation des certificats}
+\subsection{Interprétation des certificats}
 
 La tactique \textit{verit} interprète le fichier de certificat \textit{tcertif} fourni par le prouveur automatique en un terme Coq \textit{ccertif} ce qui permet de construire une preuve du but initial. \\
 
@@ -456,7 +460,7 @@ La tactique \textit{verit} interprète le fichier de certificat \textit{tcertif}
 \end{tabular}
 \end{center}
 
-Cette interprétation passe par une étape intermédiare \textit{ocertif} écrite en Ocaml. Cette étape a plusieurs avantages. Déjà, elle permet d'utiliser les outils de parsing du fichier de certificat (ocamllex, ocamlyacc). Par ailleurs, en utilisant la représentation Ocaml des termes Coq, la traduction d'un \textit{ocertif} en un \textit{ccertif} est immédiate. Enfin, les \textit{ocertif} sont définis dans un format facilement manipulable ce qui permet d'appliquer des adaptations (\ref{processing_forallinst}), des simplifications (\ref{regroupement}) ou encore des optimisations (\ref{alloc}).
+Cette interprétation passe par une étape intermédiare \textit{ocertif} écrite en Ocaml. Cette étape a plusieurs avantages. Déjà, elle permet d'utiliser les outils de parsing du fichier de certificat (ocamllex, ocamlyacc). Par ailleurs, en utilisant la représentation Ocaml des termes Coq, la traduction d'un \textit{ocertif} en un \textit{ccertif} est facilitée. Enfin, les \textit{ocertif} sont définis dans un format facilement manipulable ce qui permet d'appliquer des adaptations (\ref{processing_forallinst}), des simplifications (\ref{regroupement}) ou encore des optimisations (\ref{alloc}).
 
 
 
@@ -465,54 +469,62 @@ Cette interprétation passe par une étape intermédiare \textit{ocertif} écrit
 
 \subsubsection{Motivations}
 
-La transformation de Tseitin d'une formule donne une formule equisatisfiable qui est en CNF. L'avantage de cette transformation est que sa complexité est linéaire en temps comme en espace. En comparaison, l'utilisation des lois de de Morgan pour obtenir une formule en CNF a une complexité en pire cas exponentielle. Le principe de cette transformation est d'introduire de nouvelles variables pour toutes les sous-formules ce qui correspond au \textit{hash-consing} qui est fait par SMTCoq. Du côté SMTCoq, l'intérêt est double. D'une part, cela permet de réduire la taille des formules
+La transformation de Tseitin d'une formule donne une formule equisatisfiable qui est en CNF. L'avantage de cette transformation est que sa complexité est linéaire en temps comme en espace. En comparaison, l'utilisation des lois de de Morgan pour obtenir une formule en CNF a une complexité en pire cas exponentielle. Le principe de cette transformation est d'introduire de nouvelles variables pour toutes les sous-formules ce qui correspond au \textit{hash-consing} qui est fait par SMTCoq. Du côté SMTCoq, cela signifie un gain en espace (les sous-formules ne sont pas répétées) et un gain en temps (les comparaisons de formules deviennent des comparaison d'entiers).
 
-\subsection{Fonctionnement}
+\subsubsection{Fonctionnement}
 
--tables \\
--nouvelles variables\\
-Tseitin: exemple, transformation linéaire\\
-intérêt dans smtcoq : suivre fidèlement les certificat verit qui sont fait comme ça,
-optimisation
+Une fois toutes les sous-formules nommées en commençant par les feuilles, la transformation rajoute des formules pour s'assurer que ces nouvelles variables sont équivalentes aux sous-formules qu'elles représentent. \\
 
+On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}, et, en plus des variables $a$, $b$, $c$ et $d$, on introduit $e$ pour la sous-formule $a \wedge b$, $f$ pour la sous-formule $e \vee c$ et $g$ pour la sous-formule $f \wedge d$ (qui est en fait toute la formule). La formule transformée devient donc $g \wedge D_e \wedge D_f \wedge D_g$ où les $D_\alpha$ sont des formules qui nous assure que $\alpha$ est équivalent à la formule qu'il représente. On a par exemple $D_e = (\neg a \vee \neg b \vee e) \wedge (\neg e \vee a) \wedge (\neg e \wedge b)$. \\
 
+Dans SMTCoq, à la place du rajout des formules $D_\alpha$, les sous-formules sont enregistrées dans un tableau: une nouvelle sous-formule peut faire référence à une sous-formule qui est à un précédent index dans le tableau. 
 
- \subsection{Le type inductif \textit{crule}}\label{regroupement}
+\subsection{Le type inductif \textit{crule}}\label{regroupement}
 
-
-
-Une clause contient un $scertif$  qui est représentée par un type somme, chaque constructeur regroupant plusieurs étapes qui peuvent apparaître dans le certificat.\\
-
-A FAIRE : un schéma sur les scertif :  inductive scertif = ImmBuildProj c params $|$ EqTr f1 ... fn f \\
+Une \textit{crule} est un type somme, chaque constructeur représentant alternativement l'une ou l'autre d'une ensemble de \textit{trule} qui contient aussi un paramètre de position (\ref{checker}).\\
 
 Le constructeur ImmBuildProj par exemple regroupe les règles not\_implies1 et not\_implies2. EqTr est la transitivité de l'égalité : f1 .. fn et f doivent suivre le chéma de la transitivité : par exemple f1 = ~(a1=a2) f2= ~(a2=a3) ... fn=~(an=a{n+1}) et f = (a1 = a{n+1}).\\
 
-\subsection{La fonction récursive $checker$} 
-Le vérificateur définit une fonction Coq $checker$ qui est définie récursivement sur son paramètre trace qui est un tableau de clauses et qui maintient un tableau de formules appelées état. À chaque appel de checker, une nouvelle clause est consommée, $checker$ met alors à jour l'état courant.\\
+A FAIRE : un schéma sur les crule :  inductive crule = ImmBuildProj c params $|$ EqTr f1 ... fn f et finir de rédiger, un \textit{ccertif} est un tableau de \textit{crule}.
 
-Pour chaque constructeur $X$ de $scertif$ correspond une fonction $schecker$ qui est appelée par $checker$ lorsque le constructeur $X$ est rencontré. $schecker X$ donne une nouvelle formule valide à partir de celles déjà présentes dans l'état (et des tables de hashage, etc). Par exemple le $schecker$ de EqTr f1 ... fn f avec f1 ...fn et f comme ci-dessus donne la tautologie (f1 \/ ... \/ fn \/ f). Les clauses contiennent aussi une position qui indique où enregistrer la nouvelle formule.\\
+\subsection{Le type Ocaml \textit{trule}}
 
-Enfin $checker$ utilise un paramètre de position. Lorsque tous les calculs de mise à jour de clause sont faits, checker regarde à la position indiquée par l'état et renvoie vrai si la clause est vide à cet endroit et faux sinon.
+A FAIRE: contient aussi un ensemble de meta données (flag used pour l'allocation, précédent et suivant pour la modification, ...)
+
+Une trace est représentée par une liste doublement chaînée de clauses, cela permet sa modification en place. Les clauses sont formées d'un $scertif$, de ses paramètres et de la position à modifier.
+
+\subsection{La fonction récursive \textit{checker}} \label{checker}
+
+Le vérificateur définit une fonction Coq $checker$ qui est définie récursivement sur son paramètre de type $crule$ qui maintient un tableau de clauses appelé état. À chaque appel de checker, une nouvelle \textit{crule} est consommée, $checker$ met alors à jour l'état courant.\\
+
+À chaque constructeur $K$ de $crule$ correspond une fonction $schecker$ qui est appelée par $checker$ lorsque le constructeur $K$ est rencontré. $scheckerK$ donne une nouvelle clause valide à partir de celles déjà présentes dans l'état (et des tables de hashage, etc). La nouvelle clause est alors enregistrée dans l'état à la position indiquée par la \textit{crule}.\\
+
+
+Enfin \textit{checker} utilise un paramètre de position. Lorsque tous les calculs de mise à jour de \textit{crule} sont faits, \textit{checker} regarde à la position indiquée et renvoie $true$ si la clause est vide à cet endroit et $false$ sinon.
 
 \subsection{Exemples de certificats et de vérificateurs}
-\subsubsection{resolution chains}
-C'est simplement une liste de clause.
-Le schecker associé fait un fold dessus en appliquant la règle de resolution dessus. Cette règle est refutationnellement complète.
 
-\subsubsection{nor\_certif}
-Il implémente la règle $\neg (A_1 \vee A_2 \vee ... \vee A_n) \Rightarrow \neg A_i$
+\subsubsection{resolution chains}
+
+C'est une liste de formules. Le schecker associé fait un fold en appliquant la règle de resolution. Cette règle est refutationnellement complète.
+
+\subsubsection{not\_implies0 et not\_implies1}
+not\_implies0 implémente la tautologie $\neg (A \Rightarrow B) \Rightarrow A$ et not\_implies1 implémente la tautologie $\neg (A \Rightarrow B) \Rightarrow \neg B$. \\
+
+Par exemple, la $crule$ $(2, not\_implies1 \, 0)$ modifie la deuxième clause de l'état et prend comme paramètre la clause $0$ de l'état. Cette $crule$ transforme l'état 
+\[    [\neg (A \Rightarrow B);  C; D] \quad \text{en} \quad [\neg (A \Rightarrow B);  C; \neg B]. \]
+La $crule$ $(0, not\_implies0 \, 0)$ transforme ce nouvel état en $[A; C; \neg B]$. \\
 
 \subsubsection{congruence theory}
-Qui implémente les règles de transitivité et de congruence.
 
-\subsection{Calcul de $checker$} \label{alloc}
-L'état est représenté par un tableau de taille fixée initialisé avec la négation du but. Si on arrive à en déduire la clause vide alors on aura que la double négation du but est vraie. Puisque le domaine d'étude est décidable, et que les formules prouvées sont sans quantificateur, on a bien construit une preuve du but. \\
+Qui implémente les règles de transitivité et de congruence. \\
 
-A partir de la trace, la fonction $alloc$ calcule le nombre maximum de clauses à retenir à chaque étape du $checker$ (cette valeur est choisie comme la taille du tableau d'état) et assigne une position à chaque clause de la trace pour respecter cette valeur. Les clauses qui ne seront plus utilisées sont libérées, de sorte que les nouvelles clauses peuvent utiliser ces nouveaux emplacements dans l'état. \\
+Par exemple le $schecker$ de EqTr f1 ... fn f avec f1 ...fn et f comme ci-dessus donne la tautologie (f1 \/ ... \/ fn \/ f). 
 
-Une trace est représentée par une liste doublement chaînée de clauses, cela permet sa modification en place. Les clauses sont formées d'un $scertif$, de ses paramètres et de la position à modifier. Lors du parcours de la trace, à chaque nouvelle clause, l'état est modifié. Par exemple, la clause $(2, not\_implies1 \, 0)$ modifie la deuxième clause de l'état et prend comme paramètre la clause $0$ de l'état. Cette clause transforme l'état 
-\[    [\neg (A \Rightarrow B);  C; D] \quad \text{en} \quad [\neg (A \Rightarrow B);  C; \neg B]. \]
-La clause $(0, not\_implies0 \, 0)$ transforme ce nouvel état en $[A; C; \neg B]$. \\
+\subsection{Allocation dans le tableau état} \label{alloc}
+L'état est représenté par un tableau de taille fixée initialisé avec la négation du but. Si on arrive à en déduire la clause vide alors on aura que la double négation du but est vraie et donc que le but est vrai (voir \ref{negation}). \\
+
+À partir du \textit{ocertif}, la fonction $alloc$ calcule le nombre maximum de clauses à retenir à chaque étape du $checker$, cette valeur est choisie comme la taille du tableau d'état. La fonction $alloc$ assigne aussi une position à chaque \textit{orule} du \textit{ocertif} pour respecter cette valeur. Les clauses qui ne seront plus utilisées sont libérées, de sorte que les nouvelles clauses peuvent utiliser ces nouveaux emplacements dans l'état. \\
 
 
 \subsection{Théorème de correction}
