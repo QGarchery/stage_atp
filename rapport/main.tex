@@ -226,7 +226,7 @@ Qed.
 Ce fonctionnement peut être exploité pour construire des preuves qui reposent sur un calcul effectué en Coq. 
 
 
-\subsection{Réification}
+\subsection{Réification} \label{reification}
 
 \subsubsection{\textit{Embeddings}}
 
@@ -323,7 +323,7 @@ Cet algorithme termine puisque qu'à chaque répétition des étapes ci-dessus u
 
 Le langage SMT-LIB a vocation à être un format d'entrée commun à différents prouveurs SMT tels que veriT. Ce langage offre donc un cadre pour faire des comparaison de prouveurs SMT. La définition du langage \cite{smtlib} donne des indications sur la sémantique que doivent avoir certaines constructions du langage.\\
 
-Par exemple, si on s'intéresse au problème $lia5$ de la section précédente, on peut appeler un prouveur SMT sur le fichier $lia5.smt2$ suivant :     
+Pour savoir si le problème $lia5$ de la section précédente est satisfiable, on peut appeler un prouveur SMT sur le fichier $lia5.smt2$ suivant :
 \begin{lstlisting}[frame=single]
 (set-logic QF_LIA)
 (declare-fun x () Int)
@@ -442,9 +442,11 @@ On notera que c'est bien la négation de la formule énoncée dans le fichier SM
 
 
 \newpage
-\section{Certificats et vérificateur}
+\section{Transformation de certificats}
 
-\subsection{Interprétation des certificats}
+Nous avons vu dans la partie précédente que c'est grâce à un procédé de réification (\ref{reification}) que l'on peut passer du but initial en Coq au prouveur automatique. Nous examinons maintenant comment la réponse du prouveur automatique, le fichier de certificat, peut être transformé en un terme de preuve Coq.
+
+\subsection{Des certificats de toutes les couleurs}
 
 La tactique $verit$ interprète le fichier de certificat \textit{tcertif} fourni par le prouveur automatique en un terme Coq \textit{ccertif} ce qui permet de construire une preuve du but initial. \\
 
@@ -460,22 +462,19 @@ La tactique $verit$ interprète le fichier de certificat \textit{tcertif} fourni
 \end{tabular}
 \end{center}
 
-Cette interprétation passe par une étape intermédiare \textit{ocertif} écrite en Ocaml. Cette étape a plusieurs avantages. Déjà, elle permet d'utiliser les outils de parsing du fichier de certificat (ocamllex, ocamlyacc). Par ailleurs, en utilisant la représentation Ocaml des termes Coq, la traduction d'un \textit{ocertif} en un \textit{ccertif} est facilitée. Enfin, les \textit{ocertif} sont définis dans un format facilement manipulable ce qui permet d'appliquer des adaptations (\ref{processing_forallinst}), des simplifications (\ref{regroupement}) ou encore des optimisations (\ref{alloc}).
-
-
-
+Cette interprétation passe par une étape intermédiare \textit{ocertif} écrite en Ocaml. Cette étape a plusieurs avantages. Déjà, elle permet d'utiliser les outils de \textit{parsing} du fichier de certificat (ocamllex, ocamlyacc). Par ailleurs, en utilisant la représentation Ocaml des termes Coq, la traduction d'un \textit{ocertif} en un \textit{ccertif} est facilitée. Enfin, les \textit{ocertif} sont définis dans un format facilement manipulable ce qui permet d'appliquer des adaptations (\ref{processing_forallinst}), des simplifications (\ref{regroupement}) ou encore des optimisations (\ref{alloc}).
 
 \subsection{Transformation de Tseitin et \textit{hash-consing}} \label{tseitin}
 
 \subsubsection{Motivations}
 
-La transformation de Tseitin d'une formule donne une formule équisatisfiable qui est en CNF. L'avantage de cette transformation est que sa complexité est linéaire en temps comme en espace. En comparaison, l'utilisation des lois de De Morgan pour obtenir une formule en CNF a une complexité en pire cas exponentielle. Le principe de cette transformation est d'introduire de nouvelles variables pour toutes les sous-formules ce qui correspond au \textit{hash-consing} qui est fait par SMTCoq. Du côté SMTCoq, cela signifie un gain en espace (les sous-formules ne sont pas répétées) et un gain en temps (les comparaisons de formules deviennent des comparaisons d'entiers).
+La transformation de Tseitin d'une formule donne une formule équisatisfiable qui est en CNF. L'avantage de cette transformation est que sa complexité est linéaire en temps comme en espace. En comparaison, l'utilisation des lois de De Morgan pour obtenir une formule en CNF a une complexité en pire cas exponentielle. Le principe de cette transformation est d'introduire de nouvelles variables pour toutes les sous-formules ce qui correspond au \textit{hash-consing} qui est fait par SMTCoq. Cette étape intervient au moment du \textit{parsing}, c'est-à-dire au moment du passage d'un \textit{tcertif} à un \textit{ocertif}. Du point de vue de SMTCoq, ce procédé signifie un gain en espace (les sous-formules ne sont pas répétées) et un gain en temps (les comparaisons de formules deviennent des comparaisons d'entiers).
 
 \subsubsection{Fonctionnement}
 
 Une fois toutes les sous-formules nommées en commençant par les feuilles, la transformation rajoute des formules pour s'assurer que ces nouvelles variables sont équivalentes aux sous-formules qu'elles représentent. \\
 
-On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}, et, en plus des variables $a$, $b$, $c$ et $d$, on introduit $e$ pour la sous-formule $a \wedge b$, $f$ pour la sous-formule $e \vee c$ et $g$ pour la sous-formule $f \wedge d$ (qui est en fait toute la formule). La formule transformée devient donc $g \wedge D_e \wedge D_f \wedge D_g$ où les $D_\alpha$ sont des formules qui nous assure que $\alpha$ est équivalent à la formule qu'il représente. On a par exemple $D_e = (\neg a \vee \neg b \vee e) \wedge (\neg e \vee a) \wedge (\neg e \wedge b)$. \\
+On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}. En nommant les atomes on avait obtenu  $((a \wedge b) \vee c) \wedge d$. On introduit également $e$ pour la sous-formule $a \wedge b$, $f$ pour la sous-formule $e \vee c$ et $g$ pour la sous-formule $f \wedge d$ (qui est en fait toute la formule). La formule transformée devient donc $g \wedge D_e \wedge D_f \wedge D_g$ où les $D_\alpha$ sont des formules qui nous assure que $\alpha$ est équivalent à la formule qu'il représente. On a par exemple $D_e = (\neg a \vee \neg b \vee e) \wedge (\neg e \vee a) \wedge (\neg e \wedge b)$. \\
 
 Dans SMTCoq, au lieu de rajouter les formules $D_\alpha$, les sous-formules sont enregistrées dans un tableau: une nouvelle sous-formule peut faire référence à une sous-formule qui est à un indice précédent dans le tableau. 
 
