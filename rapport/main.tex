@@ -342,7 +342,7 @@ Dans le cas du prouveur SMT veriT, les certificats sont constitués d'une liste 
 
 \[id:(typ \,\, (clause) \,\, dep)\]
 
-où \textit{id} est un entier qui identifie la règle, \textit{typ} est le type de la règle, \textit{clause} est le résultat de la règle et \textit{dep} liste toutes les dépendances de la règle. Une clause est une liste de formules qu'il faut comprendre comme la disjonction de ces formules. Ainsi, la clause vide représentant l'absurde, montrer que le problème n'est pas satisfiable revient à obtenir une règle dont le résultat est la clause vide. Une règle peut utiliser le résultat d'une autre règle identifiée par $id$, dans ce cas sa liste de dépendance contient $id$. \\
+où $id$ est un entier qui identifie la règle, $typ$ est le type de la règle, $clause$ est le résultat de la règle et $dep$ liste toutes les dépendances de la règle. Une clause est une liste de formules qu'il faut comprendre comme la disjonction de ces formules. Ainsi, la clause vide représentant l'absurde, montrer que le problème n'est pas satisfiable revient à obtenir une règle dont le résultat est la clause vide. Une règle peut utiliser le résultat d'une autre règle identifiée par $id$, dans ce cas sa liste de dépendance contient $id$. \\
 
 Les règles de type $input$ sont des règles qui établissent les hypothèses du problèmes et correspondent à une ligne $assert$ dans le fichier SMT-LIB. Par exemple, la règle 
 \[ 0:(input \,\, (>= \,\,x \,\,0)) \]
@@ -377,30 +377,24 @@ Approche sceptique\\
 
 L'approche autarcique consiste à vérifier le code du prouveur automatique à l'intérieur de l'assistant de preuve. L'avantage de cette méthode est qu'une fois cette vérification faite, on sait que chaque appel du prouveur automatique nous renverra une preuve correcte. \\
 
-Dans l'approche sceptique, le certificat renvoyé par le prouveur automatique est vérifié à chaque appel de celui-ci. D'un côté cela signifie que la complétude du système n'est pas garantie : certains buts valides ne sont pas démontrés lorsque le prouveur automatique renvoie un certificat erroné ou que la reconstruction de la preuve par SMTCoq contient un \textit{bug}. D'un autre côté, cette approche ne fige pas l'implantation du prouveur automatique puisque ce n'est pas son code qui est vérifié mais sa sortie. Un autre avantage est que l'effort de certification est plus restreint : pour un certificat fixé, il faut vérifier que celui-ci correspond bien à une preuve du but.\\
-
-SMTCoq a une approche sceptique de la vérification des prouveurs automatiques.
+Dans l'approche sceptique, le certificat renvoyé par le prouveur automatique est vérifié à chaque appel de celui-ci. Cette approche - qui est celle qui est utilisée par SMTCoq - ne permet pas de garantir la complétude du système : certains buts valides ne sont pas démontrés, notamment lorsque le prouveur automatique renvoie un certificat erroné ou que la reconstruction de la preuve par SMTCoq n'est pas possible. En retour, cette approche ne fige pas l'implantation du prouveur automatique puisque ce n'est pas son code qui est vérifié mais sa sortie. Un autre avantage est que l'effort de certification est plus restreint : pour un certificat fixé, il faut vérifier que celui-ci correspond bien à une preuve du but.
 
 \subsection{Fonctionnement de SMTCoq}
 
-\subsubsection{Passage à la négation du but} \label{negation}
+\subsubsection{Amélioration de l'automatisation}\label{negation}
 
-Les prouveurs automatiques fournissent un certificat uniquement dans le cas où le problème n'est pas satisfiable (\ref{smt}). Pour utiliser ce fonctionnement, SMTCoq envoie la négation du but au prouveur automatique. On s'attend alors à obtenir $unsat$. Si c'est le cas on a montré que la négation du but implique la clause vide. Autrement dit, on a une preuve de la double négation du but. SMTCoq ne traitant que les cas où les domaines des variables sont décidables, on récupère une preuve de but initial.
+Les tactiques Coq définies par SMTCoq invoquent chacune un prouveur automatique différent : zChaff, CVC4 ou veriT. Ces tactiques permettent à l'utilisateur Coq d'appeler le prouveur automatique sur le but courant et donc de profiter de son automatisation. \\
 
-
-\subsubsection{Amélioration de l'automatisation}
-
-SMTCoq définit des tactiques Coq, une par prouveur automatique : \textit{zchaff} et \textit{verit}. \\
-
+Les prouveurs automatiques fournissent un certificat uniquement dans le cas où le problème n'est pas satisfiable (\ref{sortie}). Pour utiliser ce fonctionnement, SMTCoq envoie la négation du but au prouveur automatique. La preuve ne peut être reconstruite que dans le cas où la réponse est $unsat$ et est accompagnée d'un fichier de certificat. Ce fichier prouve que la négation du but mène à l'absurde. Autrement dit, on obtient une preuve de la double négation du but. Les domaines des variables étant toujours supposés décidables dans SMTCoq, on récupère une preuve du but initial.
 
 \begin{center}
     \includegraphics[height=5cm]{Automatisation.pdf}
 \end{center}
 
 La première étape est la réification, le lemme est traduit dans l'AST des formules acceptées par SMTCoq. Le prouveur automatique est appelé à partir de cet AST. En cas de succès de ce prouveur, on obtient un certificat de preuve. 
-Il s'agit ensuite de rejouer ce certificat en Coq, on utilise pour cela le vérificateur de SMTCoq. Il faut donc mettre le certificat dans une forme adaptée qu'on appelle trace. Le pré-processeur effectue une étape de \textit{parsing} du certificat qui se souvient des sous-formules déjà rencontrées (\textit{hash-consing}) à l'aide de \textit{hash tables}.  Il y a aussi une étape d'adaptation de ces certificats. En effet, les prouveurs automatiques peuvent parfois ne pas mentionner une étape de la preuve qu'il faut alors construire. De plus, il faut pouvoir adapter les certificats à fournis par le prouveur automatiques qui peuvent reposer sur une logique différente de celle de Coq. \\
+Il s'agit ensuite de rejouer ce certificat en Coq, on utilise pour cela le vérificateur de SMTCoq. Il faut donc mettre le certificat dans une forme adaptée qu'on appelle trace. Le pré-processeur effectue une étape de \textit{parsing} du certificat qui se souvient des sous-formules déjà rencontrées (\textit{hash-consing}) à l'aide de tables de hachage.  Il y a aussi une étape d'adaptation de ces certificats. En effet, les prouveurs automatiques peuvent parfois ne pas mentionner une étape de la preuve qu'il faut alors construire. De plus, il faut pouvoir adapter les certificats à fournis par le prouveur automatiques qui peuvent reposer sur une logique différente de celle de Coq. \\
 
-Ces tactiques permettent à l'utilisateur Coq de profiter de l'automatisation de différents prouveurs.\\
+
 
 
 
@@ -423,10 +417,9 @@ Dans les deux cas, les formules acceptées sont les formules logiques propositio
 
 \subsection{Utilisation de SMTCoq}
 
-\subsubsection{La tactique verit}
+\subsubsection{La tactique $verit$}
 
-SMTCoq définit une nouvelle tactique, appelée dans Coq par \textit{verit}, qui permet de résoudre automatiquement les buts dans les booléens en forme prénexe. On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}.
-
+La nouvelle tactique $verit$ définie par SMTCoq permet de résoudre automatiquement les buts dans les booléens en forme prénexe. On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}.
 
 \begin{lstlisting}[frame=single]
 Lemma lia5 : 
@@ -453,7 +446,7 @@ On notera que c'est bien la négation de la formule énoncée dans le fichier SM
 
 \subsection{Interprétation des certificats}
 
-La tactique \textit{verit} interprète le fichier de certificat \textit{tcertif} fourni par le prouveur automatique en un terme Coq \textit{ccertif} ce qui permet de construire une preuve du but initial. \\
+La tactique $verit$ interprète le fichier de certificat \textit{tcertif} fourni par le prouveur automatique en un terme Coq \textit{ccertif} ce qui permet de construire une preuve du but initial. \\
 
 \begin{center}
 \begin{tabular}{ |c||c|c|c| } 
@@ -484,34 +477,34 @@ Une fois toutes les sous-formules nommées en commençant par les feuilles, la t
 
 On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}, et, en plus des variables $a$, $b$, $c$ et $d$, on introduit $e$ pour la sous-formule $a \wedge b$, $f$ pour la sous-formule $e \vee c$ et $g$ pour la sous-formule $f \wedge d$ (qui est en fait toute la formule). La formule transformée devient donc $g \wedge D_e \wedge D_f \wedge D_g$ où les $D_\alpha$ sont des formules qui nous assure que $\alpha$ est équivalent à la formule qu'il représente. On a par exemple $D_e = (\neg a \vee \neg b \vee e) \wedge (\neg e \vee a) \wedge (\neg e \wedge b)$. \\
 
-Dans SMTCoq, au lieu de rajouter les formules $D_\alpha$, les sous-formules sont enregistrées dans un tableau: une nouvelle sous-formule peut faire référence à une sous-formule qui est à un précédent index dans le tableau. 
+Dans SMTCoq, au lieu de rajouter les formules $D_\alpha$, les sous-formules sont enregistrées dans un tableau: une nouvelle sous-formule peut faire référence à une sous-formule qui est à un indice précédent dans le tableau. 
 
 
 
 \subsection{Le type inductif \textit{crule}}\label{regroupement}
 
-Une \textit{crule} est un type somme, chaque constructeur pouvant représenter alternativement l'une ou l'autre d'un ensemble de \textit{trule}. Chacun de ces constructeurs contient aussi paramètre de position utilisé par la fonction \textit{checker} (\ref{checker}). Par exemple, le constructeur \textit{ImmBuildProj} regroupe les règles \textit{not\_implies0} et \textit{not\_implies1} et contient aussi un paramètre de type \textit{int} (qui vaut donc 0 ou 1). Ce regroupement permet d'unifier le fonctionnement de règles similaires et donc de simplifier le traitement de ces règles dans la suite du code.
+Une \textit{crule} est un type somme, chaque constructeur pouvant représenter alternativement l'une ou l'autre d'un ensemble de \textit{trule}. Chacun de ces constructeurs contient aussi paramètre de position utilisé par la fonction $checker$ (\ref{checker}). Par exemple, le constructeur $ImmBuildProj$ regroupe les règles $not\_implies0$ et $not\_implies1$ et contient aussi un paramètre de type \textit{int} (qui vaut donc 0 ou 1). Ce regroupement permet d'unifier le fonctionnement de règles similaires et donc de simplifier le traitement de ces règles dans la suite du code.
 
 \subsection{Le type Ocaml \textit{orule}}
 
- Les \textit{orule} sont des \textit{record} constitués, en plus du code Ocaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ \textit{prev} et un champ \textit{next}. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ \textit{used} de type \textit{int} qui est utilisé par la fonction \textit{alloc} (\ref{alloc}).
+ Les \textit{orule} sont des enregistrements constitués, en plus du code Ocaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ $prev$ et un champ $next$. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ $used$ de type \textit{int} qui est utilisé par la fonction $alloc$ (\ref{alloc}).
 
-\subsection{La fonction récursive \textit{checker}} \label{checker}
+\subsection{La fonction récursive $checker$} \label{checker}
 
-Le vérificateur contient une fonction Coq \textit{checker} qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui maintient un tableau de clauses appelé état (une clause est une disjonction de formules). À chaque appel de \textit{checker}, une nouvelle \textit{crule} est consommée, \textit{checker} met alors à jour l'état courant.\\
+Le vérificateur contient une fonction Coq $checker$ qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui maintient un tableau de clauses appelé état (une clause est une disjonction de formules). À chaque appel de $checker$, une nouvelle \textit{crule} est consommée, $checker$ met alors à jour l'état courant.\\
 
-À chaque constructeur \textit{K} de \textit{crule} correspond une fonction \textit{scheckerK} qui est appelée par \textit{checker} lorsque le constructeur \textit{K} est rencontré. \textit{scheckerK} donne une nouvelle clause valide à partir de celles déjà présentes dans l'état. La nouvelle clause est alors enregistrée dans l'état à la position indiquée par la \textit{crule}.\\
+À chaque constructeur $K$ de \textit{crule} correspond une fonction $scheckerK$ qui est appelée par $checker$ lorsque le constructeur $K$ est rencontré. $scheckerK$ donne une nouvelle clause valide à partir de celles déjà présentes dans l'état. La nouvelle clause est alors enregistrée dans l'état à la position indiquée par la \textit{crule}.\\
 
-Enfin \textit{checker} utilise un paramètre de position. Lorsque tous les calculs de mise à jour de \textit{crule} sont faits, \textit{checker} regarde à la position indiquée et renvoie $true$ si la clause est vide à cet endroit et $false$ sinon.
+Enfin $checker$ utilise un paramètre de position. Lorsque tous les calculs de mise à jour de \textit{crule} sont faits, $checker$ regarde à la position indiquée et renvoie $true$ si la clause est vide à cet endroit et $false$ sinon.
 
 \subsection{Exemples de certificats et de vérificateurs}
 
-\subsubsection{Règles \textit{not\_implies0} et \textit{not\_implies1}}
-La règle \textit{not\_implies0} implémente la tautologie qui donne $A$ à partir de $\neg (A \Rightarrow B)$ et \textit{not\_implies1} implémente la tautologie qui donne $\neg B$ à partir de $\neg (A \Rightarrow B)$. \\
+\subsubsection{Règles $not\_implies0$ et $not\_implies1$}
+La règle $not\_implies0$ implémente la règle logique qui donne $A$ à partir de $\neg (A \Rightarrow B)$ et $not\_implies1$ implémente la règle logique qui donne $\neg B$ à partir de $\neg (A \Rightarrow B)$. \\
 
-Par exemple, le \textit{schecker} de la règle $not\_implies1 \, 0$ prend comme paramètre la clause $0$ de l'état. Si cette clause a bien la forme $ \neg (X \Rightarrow Y)$ alors le \textit{schecker} renvoie la clause $(\neg Y)$. Sinon le \textit{schecker} renvoie la clause $(true)$ ce qui correspond à un échec d'application de cette règle. \\
+Par exemple, le $schecker$ de la règle $not\_implies1 \, 0$ prend comme paramètre la clause $0$ de l'état. Si cette clause a bien la forme $ \neg (X \Rightarrow Y)$ alors le $schecker$ renvoie la clause $(\neg Y)$. Sinon le $schecker$ renvoie la clause $(true)$ ce qui correspond à un échec d'application de cette règle. \\
 
-Prenons l'exemple de la \textit{crule} $ImmBuildProj \, 2 \, 1 \, 0$ qui a comme paramètre de position 2, et les autres paramètres ont la même signification que pour la règle  $not\_implies1 \, 0$. Lorsque \textit{checker} est appelé sur cette \textit{crule} avec comme état initial  $[\neg (A \Rightarrow B);  C; D]$, l'état est transformé en $[\neg (A \Rightarrow B);  C; \neg B]$. Appliqué à la \textit{crule} $ImmBuildProj \, 1 \, 0 \, 0$, \textit{checker} transforme ce nouvel état en $[\neg (A \Rightarrow B);  A; \neg B]$. 
+Prenons l'exemple de la \textit{crule} $ImmBuildProj \, 2 \, 1 \, 0$ qui a comme paramètre de position 2, et les autres paramètres ont la même signification que pour la règle  $not\_implies1 \, 0$. Lorsque $checker$ est appelé sur cette \textit{crule} avec comme état initial  $[\neg (A \Rightarrow B);  C; D]$, l'état est transformé en $[\neg (A \Rightarrow B);  C; \neg B]$. Appliqué à la \textit{crule} $ImmBuildProj \, 1 \, 0 \, 0$, $checker$ transforme ce nouvel état en $[\neg (A \Rightarrow B);  A; \neg B]$. 
 
 \subsubsection{Chaînes de résolution}
 
@@ -519,7 +512,7 @@ A FAIRE
 
 \subsubsection{Règle de transitivité}
 
-La \textit{crule} $EqTr\,f_1\,...\,f_n\,f$ implémente la transitivité de l'égalité, $f_1$, ..., $f_n$ et $f$ doivent suivre le schéma de la transitivité : par exemple $f_1 = ~(a_1=a_2)$, $f_2= ~(a_2=a_3)$, ..., $f_n=~(a_n=a_{n+1})$ et $f = (a_1 = a_{n+1})$. Si c'est le cas alors le \textit{schecker} renvoie la clause $(f_1\,...\,f_n\,f)$, sinon le \textit{schecker} renvoie la clause $(true)$.
+La \textit{crule} $EqTr\,f_1\,...\,f_n\,f$ implémente la transitivité de l'égalité, $f_1$, ..., $f_n$ et $f$ doivent suivre le schéma de la transitivité : par exemple $f_1 = ~(a_1=a_2)$, $f_2= ~(a_2=a_3)$, ..., $f_n=~(a_n=a_{n+1})$ et $f = (a_1 = a_{n+1})$. Si c'est le cas alors le $schecker$ renvoie la clause $(f_1\,...\,f_n\,f)$, sinon le $schecker$ renvoie la clause $(true)$.
 
 \subsection{Allocation dans le tableau état} \label{alloc}
 
@@ -602,9 +595,9 @@ A FAIRE : expliquer SAME
 
 \subsection{Reconnaître les lemmes}
 -le problème vient du fait que les lemmes peuvent être modifiés par verit (en particulier la symétrie de l'égalité), que le but initial doit être fidèlement traduit pour qu'on ait bien le fait que l'interprétation de la réification d'un terme soit égale au terme \\
--pour faire ça on utilise deux hash table distinctes. Une pour stocker les lemmes exactement comme ils apparaissent dans verit afin de prouver la bonne chose. Une autre pour les reconnaître une fois qu'ils apparaissent\\
+-pour faire ça on utilise deux tables de hachage distinctes. Une pour stocker les lemmes exactement comme ils apparaissent dans verit afin de prouver la bonne chose. Une autre pour les reconnaître une fois qu'ils apparaissent\\
 -une fois que c'est fait on peut reconnaître les lemmes et en particulier il faut distinguer le but des autres lemmes (pas le même traitement du tout)\\
--d'autre part le hash-consing 'tel quel' ne doit se faire que sur les termes qui ne contiennent pas de variable liées pour ne pas encombrer les tables de symboles inutiles\\
+-d'autre part le hash-consing 'tel quel' ne doit se faire que sur les termes qui ne contiennent pas de variable liées pour ne pas encombrer les tables de hachage de symboles inutiles\\
 
 A FAIRE : rédiger cette section
 
@@ -612,7 +605,7 @@ A FAIRE : rédiger cette section
 
 \subsection{Preuves d'instanciation}
 
-Les certificats veriT peuvent faire des transformations silencieuses lors de l'instanciation des lemmes ($trule$ FORALLINST). D'autre part, on a vu que les modifications de certificat dûes à la symétrie de l'égalité peuvent être traitées uniquement dans les preuves d'instanciation. Dans cette section, on propose une méthode pour prendre en compte ces transformations séparément au moment des preuves d'instanciation. On définit ensuite une tactique qui regroupe ces résultats (voir Annexe \ref{simplifications}).
+Les certificats veriT peuvent faire des transformations silencieuses lors de l'instanciation des lemmes (\textit{trule} FORALLINST). D'autre part, on a vu que les modifications de certificat dues à la symétrie de l'égalité peuvent être traitées uniquement dans les preuves d'instanciation. Dans cette section, on propose une méthode pour prendre en compte ces transformations séparément au moment des preuves d'instanciation. On définit ensuite une tactique qui regroupe ces résultats (voir Annexe \ref{simplifications}).
 
 \subsubsection{Preuve automatique d'une instanciation}
 
@@ -627,7 +620,7 @@ Z.eqb (f c) (f 3) = true \\
 
 Il faut donc remettre le but dans une forme qui correspond à celle du lemme. Dans le dernier cas il s'agit de réécrire le lemme Z.eqb\_sym avant de faire auto.
 
-\subsubsection{Transformation \textit{impl\_split}}
+\subsubsection{Transformation $impl\_split$}
 
 Lorsque qu'un lemme est de la forme A:(input (forall x, f x => b)), la trule FORALLINST peut être :\\
 B:(forallinst (or (not (forall x, f x => b)) (or (not (f i)) b)))
@@ -643,7 +636,7 @@ Proof. intro. destruct a; destruct b; trivial. Qed.
 Hint Resolve impl_split.
 \end{lstlisting}
 
-\subsubsection{Transformations \textit{impl\_or\_split}}
+\subsubsection{Transformations $impl\_or\_split$}
 
 A FAIRE
 
