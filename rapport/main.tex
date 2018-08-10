@@ -24,7 +24,7 @@
 keywordstyle={[2]\color{dkblue}},
 sensitive=true,
 }
-\lstset{emph={Lemma, Theorem, Proposition, Qed, Proof, Inductive, Definition, Fixpoint, Ltac, Hint, Resolve}, emphstyle={\color{mauve}\bf}
+\lstset{emph={Lemma, Theorem, Proposition, Qed, Proof, Inductive, Definition, Fixpoint, Ltac, Hint, Resolve, Require, Import, Open, Scope}, emphstyle={\color{mauve}\bf}
 }
 \definecolor{dkblue}{rgb}{0,0,0.6}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -200,7 +200,7 @@ Qed.
 
 \subsubsection{Définitions en Coq}
 
-La réflexion calculatoire repose sur la convertibilité de deux termes: deux termes sont convertibles lorsqu'ils se réduisent vers un même terme. Aussi, à chaque nouvelle définition, la nouvelle constante qui est définie est convertible avec sa définition. \\
+La réflexion calculatoire repose sur la convertibilité de deux termes: deux termes sont convertibles lorsqu'ils se réduisent vers un même terme. Aussi, à chaque nouvelle définition, la nouvelle constante qui est définie est convertible à sa définition. \\
 
 Plutôt que d'utiliser un prédicat qui prend une formule conjonctive $t$ et un booléen $b$ et qui vérifie que $t$ s'évalue en $b$, on peut utiliser une fonction récursive qui calcule l'évaluation et combiner cette fonction récursive avec le prédicat de l'égalité. On peut ensuite montrer que les deux formalisations sont bien équivalentes.  
 \begin{lstlisting}[frame=single]
@@ -269,14 +269,16 @@ et on notera que l'évaluation de ce nouveau terme est égale à $u$.
 
 
 
-\subsubsection{Intérêt et exemple d'utilisation}
+\subsubsection{Intérêt et exemple d'utilisation} \label{interet_reification}
 
 L'intérêt de la réification est que la structure du terme réifié est mise en évidence. Il devient alors possible de manipuler explicitement cette structure. \\
 
 Par exemple, sur le type $AndTree$, il est possible de définir une fonction $peigne$ qui renvoie l'arbre en argument mis sous forme de peigne. Le théorème de correction de cette fonction établit que 
 \[ \forall t \in AndTree, \, evaluation \, (peigne \, (t)) = evaluation (t) \]
 
-En combinant ce résultat avec le procédé de réification, on peut définir une tactique $peignify$ qui met les formules conjonctives en forme de peigne. Cette tactique permet par exemple de démontrer le lemme suivant : 
+Ce théorème de correction n'est applicable que si on a un terme de la forme $evaluation \, (x)$, forme que l'on peut obtenir en remarquant que pour tout terme booléen $b$, l'évaluation de la réification de $b$ est convertible à $b$.\\
+
+En combinant tous ces résultats, on peut définir une tactique $peignify$ qui met les formules conjonctives en forme de peigne. Cette tactique permet par exemple de démontrer le lemme suivant: 
 
 \begin{lstlisting}[frame=single]
 Lemma peigne4 b1 b2 b3 b4:
@@ -301,7 +303,15 @@ Pour SMTCoq, les prouveurs automatiques sont vus comme des boîtes noires qui r�
 
 Expliquons succinctement le fonctionnement d'une version de l'algorithme DPLL \cite{dpll}. Nous ne considérerons que la théorie LIA, c'est-à-dire qu'en plus des connecteurs logiques, la théorie contient les entiers et les symboles d'addition, de soustraction et d'inégalité. On prend en exemple le problème qu'on appellera $lia5$ et qui consiste à satisfaire la formule $((x + y \leq -3 \wedge y \geq 0) \vee x \leq -3) \wedge x \geq 0$ où $x$ et $y$ sont des entiers. \\
 
-L'algorithme commence par identifier les atomes, c'est-à-dire les sous-formules spécifiques à la théorie LIA. Dans notre exemple cela revient à poser $a = (x + y \leq -3)$, $b = (y \geq 0)$, $c = (x \leq -3)$ et $d = (x \geq 0)$ et à chercher si la formule  $((a \wedge b) \vee c) \wedge d$ est satisfiable. Cette étape peut être suivie par une transformation de Tseitin (\ref{tseitin}) afin d'obtenir un problème en Forme Normale Conjonctive (CNF) qui est le format de prédilection des prouveurs SAT. \\
+L'algorithme commence par identifier les atomes, c'est-à-dire les sous-formules spécifiques à la théorie LIA. Dans notre exemple cela revient à poser 
+\begin{align*}
+a &= (x + y \leq -3) \\
+b &= (y \geq 0) \\
+c &= (x \leq -3) \\
+d &= (x \geq 0)
+\end{align*}
+
+et à chercher si la formule  $((a \wedge b) \vee c) \wedge d$ est satisfiable. Cette étape peut être suivie par une transformation de Tseitin (\ref{tseitin}) afin d'obtenir un problème en Forme Normale Conjonctive (CNF) qui est le format de prédilection des prouveurs SAT. \\
 
 Ensuite, l'algorithme DPLL répète les étapes suivantes :
 \begin{itemize}
@@ -360,7 +370,7 @@ Pour manipuler ces clauses, veriT peut utiliser une règle $resolution$. La règ
 \end{align*}
 
 
-\subsubsection{Règles $not\_implies0$ et $not\_implies1$}
+\subsubsection{Règles $not\_implies0$ et $not\_implies1$} \label{not_implies}
 La règle $not\_implies0$ implémente la règle logique qui donne $A$ à partir de $\neg (A \Rightarrow B)$ et $not\_implies1$ implémente la règle logique qui donne $\neg B$ à partir de $\neg (A \Rightarrow B)$. \\
 
 Ces règles dépendent donc du résultat d'une autre règle qui doit être une $clause$ de la forme $\neg (X \Rightarrow Y)$. Les résultats des règles $not\_implies0$ et $not\_implies1$ sont alors respectivement $X$ et $\neg Y$. \\
@@ -372,6 +382,9 @@ On peut alors montrer que la formule $\neg (A \Rightarrow A)$ n'est pas satisfia
   2&:(not\_implies1\,\, (not\,\, A) \,\,0) \\
   3&:(resolution\,\, ()\,\, 1\,\, 2)
 \end{align*}
+
+
+\newpage
 \section{Présentation de SMTCoq}
 
 \subsection{SMTCoq, une interface sceptique entre Coq et les prouveurs automatiques}\label{sceptique_autarcique}
@@ -411,7 +424,7 @@ Il s'agit ensuite de rejouer ce certificat en Coq, on utilise pour cela le véri
 
 
 
-\subsubsection{Amélioration de la confiance}
+\subsubsection{Amélioration de la confiance} \label{confiance}
 
 Dans la suite on s'attachera principalement à développer l'aspect automatisation de Coq mais SMTCoq propose également une commande de reconstruction d'une preuve effectuée par un prouveur automatique.
 
@@ -459,7 +472,7 @@ On notera que c'est bien la négation de la formule énoncée dans le fichier SM
 
 Nous avons vu dans la partie précédente que c'est grâce à un procédé de réification (\ref{reification}) que l'on peut passer du but initial en Coq au prouveur automatique. Nous allons maintenant voir comment la réponse du prouveur automatique, le fichier de certificat, peut être transformé en un terme de preuve Coq.
 
-\subsection{Des certificats de toutes les couleurs}
+\subsection{Des certificats de toutes les couleurs} \label{des_certificats}
 
 La tactique $verit$ interprète le fichier de certificat \textit{tcertif} fourni par le prouveur automatique en un terme Coq \textit{ccertif} ce qui permet de construire une preuve du but initial. \\
 
@@ -486,7 +499,7 @@ La transformation de Tseitin d'une formule donne une formule équisatisfiable qu
 
 \subsubsection{Fonctionnement}
 
-La transformation commence par nommer toutes les sous-formules en partant des feuilles. La nouvelle formule à satisfaire est alors la conjonction de la variable correspondant à la formule totale et de formules additionnelles qui garantissent que les nouvelles variables sont équivalentes aux sous-formules qu'elles représentent. \\
+La transformation commence par nommer toutes les sous-formules en partant des feuilles. La nouvelle formule à satisfaire est alors la conjonction de la variable représentant toute la formule et de formules additionnelles qui garantissent que les nouvelles variables sont équivalentes aux sous-formules qu'elles représentent. \\
 
 On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}. En nommant les atomes on avait obtenu la formule $((a \wedge b) \vee c) \wedge d$. On introduit également $e$ pour la sous-formule $a \wedge b$, $f$ pour la sous-formule $e \vee c$ et $g$ pour la sous-formule $f \wedge d$ (qui est en fait toute la formule). La formule transformée devient donc $g \wedge D_e \wedge D_f \wedge D_g$ où les $D_\alpha$ sont des formules qui nous assure que $\alpha$ est équivalent à la formule qu'il représente. On a par exemple $D_e = (\neg a \vee \neg b \vee e) \wedge (\neg e \vee a) \wedge (\neg e \wedge b)$. \\
 
@@ -494,7 +507,7 @@ Dans SMTCoq, au lieu de rajouter les formules $D_\alpha$, les sous-formules sont
 
 \subsection{Le vérificateur}
 
-Le vérificateur définit en Coq un type \textit{crule} qui représente les \textit{trule} ainsi qu'une fonction $checker$. Nous allons définir ces termes puis voir comment la combinaison des deux permet de reproduire la sémantique des certificats de veriT (\ref{sortie}).
+Le vérificateur définit en Coq un type \textit{crule} qui représente les \textit{trule} ainsi qu'une fonction $checker$. Nous allons définir ces termes, voir comment ils implémentent la sémantique des certificats de veriT (\ref{sortie}) et comment ils sont utilisés pour produire le terme de preuve.
 
 
 \subsubsection{Le type inductif \textit{crule}}\label{regroupement}
@@ -506,50 +519,52 @@ On appellera \textit{ccertif} la liste de toutes les \textit{crule} du certifica
 
 \subsubsection{La fonction récursive $checker$} \label{checker}
 
-Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état. La fonction $checker$ implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisémment, $checker$ est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui modifie l'état. À chaque appel de $checker$, une nouvelle \textit{crule} $cr$ est consommée, $checker$ met alors à jour l'état courant en fonction de $cr$.\\
+Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état. On rappelle qu'une clause représente la disjonction d'une liste de formules. On notera $(f_1 \,\, f_2\,\,  ... \,\, f_n)$ la clause contenant les formules $f_1$, $f_2$, ..., $f_n$. La fonction $checker$ implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisément, $checker$ est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui a aussi un paramètre état. À chaque appel de $checker$, une nouvelle \textit{crule} $cr$ est consommée, $checker$ met alors à jour l'état courant en fonction de $cr$.\\
 
+Il n'y a pas de \textit{crule} correspondant à la règle $input$. À la place, le tableau d'état est initialisé avec le résultat de la règle $input$. Ce fonctionnement n'est possible que lorsqu'il n'y a qu'un seul $input$, ce qui est le cas de la tactique $verit$ (la valeur d'initialisation est la négation du but). La taille du tableau est égale au nombre de règles du \textit{tcertif}. \\
 
+Lorsque toute la liste \textit{ccertif} a été consommée, $checker$ renvoie $true$ si la dernière case du tableau d'état contient la clause vide et $false$ sinon.
 
 \subsubsection{Théorème de correction}
- 
-Le vérificateur repose sur le théorème de correction suivant :
 
-\[ \forall f \,\, \forall cc. \quad checker  \,\, cc \,\, f \, = \, true \quad \Rightarrow \quad interp \, \, f \]
+Le type des formules est réifié et on peut définir une fonction d'évaluation $evaluation$ qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} $cc$ et toute formule $f$, si le tableau d'état $t$ est initialisé comme décrit précédemment, alors : 
+\[ checker  \,\, cc \,\, t \, = \, true \quad \Rightarrow \quad \neg (evaluation \, \, f) \]
+Une fois celui-ci démontré, la preuve est obtenue en l'appliquant à la réflexivité de l'égalité. En effet, si $checker  \,\, cc\,\, t  $ est convertible à $true$, alors $checker  \,\, cc\,\, t = true $ est convertible à $true = true$.
 
-A FAIRE
+\subsubsection{Exemple de l'identité}
 
+Considérons le but Coq, $implb \,\, A \,\, A = true$ où $implb$ est l'implication booléenne et appliquons la tactique $verit$. Puisque c'est la négation du but qui est envoyée à veriT, on obtient le \textit{tcertif} de \ref{not_implies}. Celui-ci est traduit par SMTCoq en un \textit{ccertif} : 
+$cc = [ImmBuildProj \,\, 0 \,\, 0; \,ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] $ et le tableau d'état est initialisé à $t = [| nid; nid; nid; nid|]$ où $nid$ est la clause $( \neg (A \Rightarrow A))$. \\
 
+\begin{align*}
+    checker \,\, cc \,\, t &= checker \,\, [ImmBuildProj \,\, 0 \,\, 0; \,ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] \,\, [| nid; nid; nid; nid|] \\
+    &= checker \,\, [ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] \,\, [| nid; (A); nid; nid|] \\
+    &= checker \,\, [Res \,\, 1 \,\, 2] \,\, [| nid; (A); (\neg A); nid|] \\
+    &= checker \,\, [] \,\, [| nid; (A); (\neg A); ()|] \\
+    &= true
+\end{align*}
+En appliquant le théorème de correction, on obtient $\neg (evaluation (\neg (A \Rightarrow A)))$, soit $\neg \neg (implb\,\, A \,\,A = true)$. On a vu que (\ref{negation}), dans le cadre de SMTCoq, on pouvait se ramener à $implb \,\, A \,\, A = true$.
 
-\subsection{Exemples de certificats et de vérificateurs}
+\subsection{Le pré-processeur}
 
-\subsubsection{Règles $not\_implies0$ et $not\_implies1$}
-La règle $not\_implies0$ implémente la règle logique qui donne $A$ à partir de $\neg (A \Rightarrow B)$ et $not\_implies1$ implémente la règle logique qui donne $\neg B$ à partir de $\neg (A \Rightarrow B)$. \\
+Les avantages d'une étape intermédiaire de compilation des certificats sont multiples (\ref{des_certificats}). Nous détaillons le format utilisé puis nous donnons une application directe de cette étape.
 
-Par exemple, le $schecker$ de la règle $not\_implies1 \, 0$ prend comme paramètre la clause $0$ de l'état. Si cette clause a bien la forme $ \neg (X \Rightarrow Y)$ alors le $schecker$ renvoie la clause $(\neg Y)$. Sinon le $schecker$ renvoie la clause $(true)$ ce qui correspond à un échec d'application de cette règle. \\
+\subsubsection{Le type Ocaml \textit{orule}}
 
-Prenons l'exemple de la \textit{crule} $ImmBuildProj \, 2 \, 1 \, 0$ qui a comme paramètre de position 2, et les autres paramètres ont la même signification que pour la règle  $not\_implies1 \, 0$. Lorsque $checker$ est appelé sur cette \textit{crule} avec comme état initial  $[\neg (A \Rightarrow B);  C; D]$, l'état est transformé en $[\neg (A \Rightarrow B);  C; \neg B]$. Appliqué à la \textit{crule} $ImmBuildProj \, 1 \, 0 \, 0$, $checker$ transforme ce nouvel état en $[\neg (A \Rightarrow B);  A; \neg B]$. 
-
-\subsubsection{Chaînes de résolution}
-
-A FAIRE
-
-\subsubsection{Règle de transitivité}
-
-La \textit{crule} $EqTr\,f_1\,...\,f_n\,f$ implémente la transitivité de l'égalité, $f_1$, ..., $f_n$ et $f$ doivent suivre le schéma de la transitivité : par exemple $f_1 = ~(a_1=a_2)$, $f_2= ~(a_2=a_3)$, ..., $f_n=~(a_n=a_{n+1})$ et $f = (a_1 = a_{n+1})$. Si c'est le cas alors le $schecker$ renvoie la clause $(f_1\,...\,f_n\,f)$, sinon le $schecker$ renvoie la clause $(true)$.
-
-\subsection{Le type Ocaml \textit{orule}}
-
- Les \textit{orule} sont des enregistrements constitués, en plus du code Ocaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ $prev$ et un champ $next$. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ $used$ de type \textit{int} qui est utilisé par la fonction $alloc$ (\ref{alloc}).
+ Les \textit{orule} sont des enregistrements constitués, en plus du code Ocaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ $prev$ et un champ $next$. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ $used$ de type \textit{int} qui est utilisé par la fonction $alloc$.
 
 
-\subsection{Allocation dans le tableau état} \label{alloc}
-Chacun des constructeurs du type \textit{crule} contient aussi paramètre de position utilisé par la fonction $checker$ (\ref{checker}).
+\subsubsection{Allocation dans le tableau état} \label{alloc}
 
+On remarque que dans l'exemple précédent, le tableau d'état n'a pas besoin d'être aussi grand : 2 emplacements suffisent pour ce certificat. Pour réduire l'espace mémoire utilisé, il faut calculer le nombre maximum de clauses à retenir à chaque étape du $checker$, c'est ce que fait la fonction $alloc$. La taille du tableau d'état est fixé à cette valeur. Cette fonction assigne aussi une position dans un nouveau paramètre des \textit{orule}. Nous noterons ce paramètre de position au début, de sorte que lorsque $checker$ rencontre la \textit{crule} $ImmBuildProj \,\, 0\,\, 1 \,\, 2$, la case $0$ de l'état est modifiée en $\neg Y$ si la case $2$ de l'état contient $\neg(X \Rightarrow Y)$. Puisque les emplacements des clauses sont modifiés, il faut aussi modifier les dépendances des règles. Enfin, $checker$ prend un paramètre qui indique quelle est la position de la dernière règle, le résultat la dernière règle n'étant pas nécessairement au dernier emplacement du tableau d'état.  
 
-L'état est représenté par un tableau de taille fixée. Cette taille est déterminée à partir du \textit{ocertif} par la fonction $alloc$ : il s'agit de calculer le nombre maximum de clauses à retenir à chaque étape du $checker$. La fonction $alloc$ assigne aussi une position à chaque \textit{orule} du \textit{ocertif} pour respecter cette valeur. Les clauses qui ne seront plus utilisées libèrent leur emplacement, de sorte que les nouvelles clauses peuvent utiliser ces nouveaux emplacements dans l'état. Cette méthode permet d'optimiser l'espace utilisé: il y a un gain de place par rapport à l'allocation naïve qui consiste à allouer un tableau de taille égale au nombre de règles.
-
-
-
+\begin{align*}
+    checker \,\, cc \,\, t \,\, 0 &= checker \,\, [ImmBuildProj \,\, 0\,\, 0 \,\, 0; \,ImmBuildProj \,\, 1\,\, 1 \,\, 1; \, Res \,\, 0 \,\, 0 \,\, 1] \,\, [| nid; nid|] \,\, 0 \\
+    &= checker \,\, [ImmBuildProj \,\, 1 \,\, 1 \,\, 1; \, Res \,\, 0 \,\, 0 \,\, 1] \,\, [| (A); nid|] \,\, 0 \\
+    &= checker \,\, [Res \,\, 0 \,\, 0 \,\, 1] \,\, [| (A); (\neg A)|] \,\, 0 \\
+    &= checker \,\, [] \,\, [| (); (\neg A)|] \,\, 0 \\
+    &= true
+\end{align*}
 
 
 
@@ -557,25 +572,27 @@ L'état est représenté par un tableau de taille fixée. Cette taille est déte
 \newpage
 \section{Ajout de quantificateurs}
 
-\subsection{Instanciation de lemmes par veriT}
 
-Considérons le but : \\
+\subsection{Instanciation d'un lemme par veriT}
 
-A FAIRE : schéma du but : instance1 f (2) = 3 avec comme lemme initial forall x, f (x) = 3 \\
+Considérons le but Coq suivant: \\
 
-Lorsqu'un lemme en forme prénexe est donné en input, veriT peut instancier ce lemme avec la commande de type FORALLINST. \\
+A FAIRE : schéma du but : instance1 f (3) = f(2) + 7 avec comme lemme initial forall x, f (x+1) = f(x) + 7 \\
 
-A:(INPUT (forall x, f (x) = 3)) \\
-B:(FORALLINST (or (not (forall x, f (x) = 3)) (f (2) = 3))) \\
+Lorsqu'un lemme en forme prénexe est donné par une règle $input$, veriT peut instancier ce lemme avec la règle $forall\_inst$: 
+\begin{align*}
+0&:(input \,\,(forall\,\, x,\,\, f (x+1) = f(x)+7) \\
+1&:(forall\_inst \,\,((not \,\,(forall\,\, x, \,\,f (x+1) = f(x)+7)) \,\,(f (3) = f(2)+7)) )\\
+2&:(resolution  \,\, (f (3) = f(2)+7) \,\,1 \,\,0) 
+\end{align*}
+On remarquera que la règle $forall\_inst$ ne dépend d'aucune autre règle. L'utilisation de la règle $2$ passe par la règle $resolution$ numérotée $3$.\\
 
-On remarquera que la commande FORALLINST ne dépend pas de l'input. L'utilisation de la commande B passe par une règle OR puis une règle RESOLUTION : \\ 
 
-C:(OR ( (not (forall x, f (x) = 3)) (f (2) = 3)) B) \\ 
-D:(RESOLUTION (f (2) = 3) A C) \\ 
+On fera attention ici, que même si ce schéma fait clairement apparaître la dépendance de $forall\_inst$ au théorème donné en $0$, cette dépendance est perdue dans la suite du certificat. En effet, dans une règle de résolution qui a plus que 2 dépendances, retrouver le théorème et son instanciation demande, a priori, d'unifier des formules contenues dans une règle $forall\_inst$ et dans une règle $input$. De plus, veriT fait un renommage des variables liées dans le théorème (l'exemple complet est présenté dans l'annexe \ref{annexe_instanciation}). Une solution à ce problème est d'utiliser le hash-consing de veriT et d'enregistrer la dépendance. La règle $2$ devient : 
+\begin{align*}
+2:(forall\_inst \,\, (or\,\, (not \,\,(forall \,\,x, \,\,f (x+1) = f(x)+7)) \,\,(f (3) = f(2)+7))) \,\,0) 
+\end{align*}
 
-On fera attention ici, que même si ce schéma fait clairement apparaître la dépendance de FORALLINST au théorème donné en A, cette dépendance est perdue dans la suite du certificat. En effet, dans une règle de RESOLUTION qui a plus que 2 dépendances, retrouver le théorème et son instanciation demande, a priori, d'unifier des formules contenues dans une commande FORALLINST et dans une commande input. De plus, veriT fait un renommage des variables liées dans le théorème (voir annexe ???? pour l'exemple concret de certificat veriT). Une solution à ce problème est d'utiliser le hash-consing de veriT et d'enregistrer la dépendance. La commande B devient : \\
-
-B:(FORALLINST (or (not (forall x, f (x) = 3)) (f (2) = 3)) A) 
 
 \subsection{Logique de veriT et de Coq}
 veriT utilise la logique classique. Ainsi, la proposition 
@@ -586,11 +603,11 @@ est une tautologie pour tout prédicat $P$ et toute valeur $n$. \\
 Cependant dans la logique intuitionniste de Coq ce n'est plus vrai. Une solution serait de remplacer cette proposition par 
 
 \[   (\forall \, x, \, P(x)) \Rightarrow (P \, (n)) \]
-mais cela demande de profonds changements des traces de SMTCoq : 
+mais cela demande de profonds changements des \textit{ccertif} et de leur utilisation par le vérificateur : 
 \begin{itemize}
 
-\item Il faut créer un nouveau scertif pour pouvoir prendre en compte toutes les commandes INPUT et pas seulement celle correspondant au but (ce qui est fait au moment de l'initialisation de l'état).
-\item Il faut modifier le format de trace et de certif pour accepter le binder $\forall$ ce qui demande ensuite de raisonner dans Coq sur des termes à $\alpha$-équivalence près.
+\item Il faut créer une nouvelle \textit{crule} pour pouvoir prendre en compte toutes les règles $input$ et pas seulement celle correspondant au but comme c'est fait au moment de l'initialisation du tableau d'état (\ref{checker}).
+\item Il faut modifier le format des \textit{crule} pour accepter les formules quantifiées ce qui demande ensuite de raisonner dans Coq sur des termes à $\alpha$-équivalence près.
 \end{itemize}
 
 
@@ -628,7 +645,7 @@ A FAIRE : rédiger cette section
 
 \subsection{Preuves d'instanciation}
 
-Les certificats veriT peuvent faire des transformations silencieuses lors de l'instanciation des lemmes (\textit{trule} FORALLINST). D'autre part, on a vu que les modifications de certificat dues à la symétrie de l'égalité peuvent être traitées uniquement dans les preuves d'instanciation. Dans cette section, on propose une méthode pour prendre en compte ces transformations séparément au moment des preuves d'instanciation. On définit ensuite une tactique qui regroupe ces résultats (voir Annexe \ref{simplifications}).
+Les certificats veriT peuvent faire des transformations silencieuses lors de l'instanciation des lemmes (\textit{trule} FORALLINST). D'autre part, on a vu que les modifications de certificat dues à la symétrie de l'égalité peuvent être traitées uniquement dans les preuves d'instanciation. Dans cette section, on propose une méthode pour prendre en compte ces transformations séparément au moment des preuves d'instanciation. On définit ensuite une tactique qui regroupe ces résultats (voir annexe \ref{annexe_simplifications}).
 
 \subsubsection{Preuve automatique d'une instanciation}
 
@@ -670,8 +687,8 @@ Pour résoudre ce problème, on commence par remarquer que la plupart du temps l
 
 \section{Travaux connexes et conclusion}
 
-Coqhammer \cite{coqhammer} est aussi un plugin pour Coq qui utilise des prouveurs automatiques. Une des différences principales par rapport à SMTCoq est que lors de la reconstruction de la preuve, Coqhammer liste les lemmes qui apparaissent dans le certificat et n'utilise rien d'autre que cette liste du certificat. Ainsi, il y a une recherche qui est faite par des tactiques en Coq et qui permet de retrouver la preuve. Cette méthode est plus robuste que celle  de SMTCoq vis-à-vis des prouveurs automatiques mais demande de chercher à nouveau la preuve et est donc plus coûteuse. De la même manière, pour retrouver les instanciations des lemmes (\ref{instanciations}), la recherche a été faite en Coq. Cette méthode s'est avérée utile pour passer outre les simplifications silencieuses des certificats qui apparaissent à ce niveau dans les certificats de veriT. \\
-Un autre outil similaire est Sledgehammer \cite{sledgehammer_manual} qui se base sur l'assistant de preuve Isabelle. Sledgehammer a mis en place un sélectionneur de lemmes qui apprend quels lemmes il est judicieux d'envoyer aux prouveurs automatiques \cite{hol_selector}.\\
+Ce stage s'inscrit dans une approche automatique de la démonstration dans un assistant de preuve et porte plus précisément sur SMTCoq. D'autres outils sont disponibles dans ce cadre, à commencer par Coqhammer \cite{coqhammer} qui est aussi un \textit{plugin} pour Coq qui utilise des prouveurs automatiques. À la différence de SMTCoq, lors de la reconstruction de la preuve, Coqhammer liste les lemmes qui apparaissent dans le certificat et n'utilise rien d'autre que cette liste du certificat. Ainsi, il y a une recherche qui est faite par des tactiques en Coq et qui permet de retrouver la preuve. Cette méthode est plus robuste que celle  de SMTCoq vis-à-vis des prouveurs automatiques mais demande de chercher à nouveau la preuve et est donc plus coûteuse. De la même manière, pour retrouver les instanciations des lemmes (partie \ref{instanciations}), la recherche a été faite en Coq. Cette méthode s'est avérée utile pour passer outre certaines simplifications silencieuses des certificats qui apparaissent à ce niveau dans les certificats de veriT. Une autre différence est que SMTCoq propose aussi une commande de vérification ce qui permet d'améliorer la confiance accordée aux prouveurs automatiques (\ref{confiance}).\\
+On peut aussi mentionner Sledgehammer \cite{sledgehammer_manual} qui est un outil développé pour l'assistant de preuve Isabelle afin d'y intégrer une interface sceptique avec des prouveurs automatiques. Sledgehammer a mis en place un sélectionneur de lemmes qui apprend quels lemmes il est judicieux d'envoyer aux prouveurs automatiques \cite{hol_selector}.\\
 
 En résumé, ce stage a permis d'améliorer l'expressivité de SMTCoq tout en restant dans un cadre qui assure la correction de la méthode. Cette amélioration de l'expressivité a été confirmée par de nouveaux tests. Enfin, ce stage ouvre de nouvelles pistes de travail (\ref{persp}): améliorer l'efficacité, étendre les cas d'application, utiliser SMTCoq pour la certification Why3, etc.
 
@@ -687,6 +704,8 @@ En résumé, ce stage a permis d'améliorer l'expressivité de SMTCoq tout en re
 
 \section{Annexes}
 \subsection{Formules booléennes conjonctives} \label{annexe_peigne}
+
+On donne ici deux définitions, la preuve de leur équivalence, la mise en forme de peigne des formules conjonctives, la correction de cette fonction, la réification d'un booléen et une tactique qui utilise la réflexion calculatoire.
 
 \begin{lstlisting}[frame=single]
 Require Import Bool.
@@ -821,8 +840,47 @@ Proof.
 Qed.
 \end{lstlisting}
 
-\subsection{Instanciation de lemmes et transformations de veriT} \label{simplifications}
+\subsection{Fichier SMT-LIB et certificat veriT d'une instanciation} \label{annexe_instanciation}
 
+\lstset{language=Java}
+
+Lorsqu'on appelle veriT sur le fichier SMT-LIB $simple\_instance.smt2$ suivant : 
+\begin{lstlisting}[frame=single]
+(set-logic UFLIA)
+(declare-fun f (Int) Int)
+(assert (not (= (f 3) (+ (f 2) 7))))
+(assert (forall ( (x Int) ) (= (f (+ x 1)) (+ (f x) 7))))
+(check-sat)
+(exit)
+\end{lstlisting}
+
+on obtient $unsat$ et la preuve dans un fichier contenant : 
+
+\begin{lstlisting}[frame=single]
+1:(input ((not #1:(= #2:(f 3) #3:(+ #4:(f 2) 7)))))
+2:(input (#5:(forall ( (x Int) ) #6:(= #7:(f #8:(+ x 1)) #9:(+ #10:(f x) 7)))))
+3:(tmp_betared (#11:(forall ( (@vr0 Int) ) #12:(= #13:(f #14:(+ @vr0 1)) #15:(+ #16:(f @vr0) 7)))) 2)
+4:(tmp_qnt_tidy (#17:(forall ( (@vr1 Int) ) #18:(= #19:(f #20:(+ @vr1 1)) #21:(+ #22:(f @vr1) 7)))) 3)
+5:(forall_inst (#23:(or (not #17) #24:(= #3 #25:(f #26:(+ 2 1))))))
+6:(or ((not #17) #24) 5)
+7:(resolution (#24) 6 4)
+8:(eq_transitive ((not #27:(= #2 #25)) (not #24) #1))
+9:(eq_congruent ((not #28:(= 3 #26)) #27))
+10:(resolution ((not #24) #1 (not #28)) 8 9)
+11:(resolution ((not #28)) 10 1 7)
+12:(la_disequality (#29:(or #28 (not #30:(<= 3 #26)) (not #31:(<= #26 3)))))
+13:(or (#28 (not #30) (not #31)) 12)
+14:(resolution ((not #30) (not #31)) 13 11)
+15:(la_generic (#31))
+16:(resolution ((not #30)) 14 15)
+17:(la_generic (#30))
+18:(resolution () 17 16)
+\end{lstlisting}
+
+
+\subsection{Instanciation de lemmes et transformations de veriT} \label{annexe_simplifications}
+
+\lstset{language=coq}
 \begin{lstlisting}[frame=single]
 Require Import Bool.
 Open Scope Z_scope.
