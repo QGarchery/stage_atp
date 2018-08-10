@@ -319,7 +319,7 @@ ce qui signifie que toutes les variables booléennes sont à $true$ sauf $b$ qui
 
 Cet algorithme termine puisque qu'à chaque répétition des étapes ci-dessus une nouvelle instanciation des atomes n'est plus possible et qu'il y a un nombre fini de telles instanciations. 
 
-\subsection{Format d'entrée : le langage SMT-LIB} \label{smt-lib}
+\subsection{Format d'entrée, le langage SMT-LIB} \label{smt-lib}
 
 Le langage SMT-LIB a vocation à être un format d'entrée commun à différents prouveurs SMT tels que veriT. Ce langage offre donc un cadre pour faire des comparaison de prouveurs SMT. La définition du langage \cite{smtlib} donne des indications sur la sémantique que doivent avoir certaines constructions du langage.\\
 
@@ -333,22 +333,26 @@ Pour savoir si le problème $lia5$ de la section précédente est satisfiable, o
 (exit)
 \end{lstlisting}
 
-\subsection{Format de sortie} \label{sortie}
+\subsection{Format de sortie, les certificats de veriT} \label{sortie}
 
-Lorsqu'on appelle un prouveur automatique sur un fichier SMT-LIB (\ref{smt-lib}), si la conjonction des assertions est satisfiable, le prouveur renvoie $sat$. Si la conjonction des assertions n'est pas satisfiable, le prouveur renvoie $unsat$ et fournit un fichier de certificat qui est un fichier qui explique pourquoi ce n'est pas satisfiable. Le format de ce fichier de certificat peut varier en fonction du prouveur SMT considéré. \\
+Lorsqu'on appelle un prouveur automatique sur un fichier SMT-LIB, si la conjonction des assertions est satisfiable, le prouveur renvoie $sat$. Si la conjonction des assertions n'est pas satisfiable, le prouveur renvoie $unsat$ et fournit un fichier de certificat qui est un fichier qui explique pourquoi ce n'est pas satisfiable. Le format de ce fichier de certificat peut varier en fonction du prouveur SMT considéré. \\
 
 
-Dans le cas du prouveur SMT veriT, les certificats sont constitués d'une liste de règles de la forme : 
+Dans la suite de cette section nous nous intéressons aux certificats du prouveur SMT veriT. Ils sont constitués d'une liste de règles de la forme : 
 
 \[id:(typ \,\, (clause) \,\, dep)\]
 
-où $id$ est un entier qui identifie la règle, $typ$ est le type de la règle, $clause$ est le résultat de la règle et $dep$ liste toutes les dépendances de la règle. Une clause est une liste de formules qu'il faut comprendre comme la disjonction de ces formules. Ainsi, la clause vide représentant l'absurde, montrer que le problème n'est pas satisfiable revient à obtenir une règle dont le résultat est la clause vide. Une règle peut utiliser le résultat d'une autre règle identifiée par $id$, dans ce cas sa liste de dépendance contient $id$. \\
+où $id$ est un entier qui identifie la règle, $typ$ est le type de la règle, $clause$ est le résultat de la règle et $dep$ liste toutes les dépendances de la règle. Une clause est une liste de formules qu'il faut comprendre comme la disjonction de ces formules. Ainsi, la clause vide représentant l'absurde, montrer que le problème n'est pas satisfiable revient à obtenir une règle dont le résultat est la clause vide. Une règle peut utiliser le résultat d'une autre règle identifiée par $id$, dans ce cas sa liste de dépendance contient $id$.
+
+\subsubsection{Règle $input$}
 
 Les règles de type $input$ sont des règles qui établissent les hypothèses du problèmes et correspondent à une ligne $assert$ dans le fichier SMT-LIB. Par exemple, la règle 
 \[ 0:(input \,\, (>= \,\,x \,\,0)) \]
 est utilisée dans le cas où on suppose que $x$ est un entier positif. Cette règle (et les règles $input$ en général) ne dépend pas du résultat d'autres règles.\\
 
-Pour manipuler ces clauses, veriT peut utiliser une règle de type $resolution$. La règle de résolution sur deux clauses forme une nouvelle clause contenant toutes les formules de ces deux clauses sauf celles qui ont leur négation dans l'autre clause. Par exemple, la résolution de $a \vee b$ et de $\neg a \vee \neg c$ donne $b \vee \neg c$. Grâce à cette règle, on peut montrer que le problème qui suppose l'existence d'un entier $x$ tel que $x \geq 0$ et $\neg (x \geq 0)$ n'est pas satisfiable : 
+\subsubsection{Règle $resolution$}
+
+Pour manipuler ces clauses, veriT peut utiliser une règle $resolution$. La règle de résolution sur deux clauses forme une nouvelle clause contenant toutes les formules de ces deux clauses sauf celles qui ont leur négation dans l'autre clause. Par exemple, la résolution de $a \vee b$ et de $\neg a \vee \neg c$ donne $b \vee \neg c$. Grâce à cette règle, on peut montrer que le problème qui suppose l'existence d'un entier $x$ tel que $x \geq 0$ et $\neg (x \geq 0)$ n'est pas satisfiable : 
 \begin{align*}
 0&:(input \,\, (>= \,\,x \,\,0)) \\
 1&:(input \,\, (not \,\, (>= \,\,x \,\,0))) \\
@@ -356,9 +360,18 @@ Pour manipuler ces clauses, veriT peut utiliser une règle de type $resolution$.
 \end{align*}
 
 
+\subsubsection{Règles $not\_implies0$ et $not\_implies1$}
+La règle $not\_implies0$ implémente la règle logique qui donne $A$ à partir de $\neg (A \Rightarrow B)$ et $not\_implies1$ implémente la règle logique qui donne $\neg B$ à partir de $\neg (A \Rightarrow B)$. \\
 
+Ces règles dépendent donc du résultat d'une autre règle qui doit être une $clause$ de la forme $\neg (X \Rightarrow Y)$. Les résultats des règles $not\_implies0$ et $not\_implies1$ sont alors respectivement $X$ et $\neg Y$. \\
 
-\newpage 
+On peut alors montrer que la formule $\neg (A \Rightarrow A)$ n'est pas satisfiable:
+\begin{align*}
+  0&:(input\,\, ((not\,\, (=> A \,\,A)))) \\
+  1&:(not\_implies0\,\, (A)\,\, 0) \\
+  2&:(not\_implies1\,\, (not\,\, A) \,\,0) \\
+  3&:(resolution\,\, ()\,\, 1\,\, 2)
+\end{align*}
 \section{Présentation de SMTCoq}
 
 \subsection{SMTCoq, une interface sceptique entre Coq et les prouveurs automatiques}\label{sceptique_autarcique}
@@ -444,7 +457,7 @@ On notera que c'est bien la négation de la formule énoncée dans le fichier SM
 \newpage
 \section{Transformation de certificats}
 
-Nous avons vu dans la partie précédente que c'est grâce à un procédé de réification (\ref{reification}) que l'on peut passer du but initial en Coq au prouveur automatique. Nous examinons maintenant comment la réponse du prouveur automatique, le fichier de certificat, peut être transformé en un terme de preuve Coq.
+Nous avons vu dans la partie précédente que c'est grâce à un procédé de réification (\ref{reification}) que l'on peut passer du but initial en Coq au prouveur automatique. Nous allons maintenant voir comment la réponse du prouveur automatique, le fichier de certificat, peut être transformé en un terme de preuve Coq.
 
 \subsection{Des certificats de toutes les couleurs}
 
@@ -470,31 +483,42 @@ Cette interprétation passe par une étape intermédiare \textit{ocertif} écrit
 
 La transformation de Tseitin d'une formule donne une formule équisatisfiable qui est en CNF. L'avantage de cette transformation est que sa complexité est linéaire en temps comme en espace. En comparaison, l'utilisation des lois de De Morgan pour obtenir une formule en CNF a une complexité en pire cas exponentielle. Le principe de cette transformation est d'introduire de nouvelles variables pour toutes les sous-formules ce qui correspond au \textit{hash-consing} qui est fait par SMTCoq. Cette étape intervient au moment du \textit{parsing}, c'est-à-dire au moment du passage d'un \textit{tcertif} à un \textit{ocertif}. Du point de vue de SMTCoq, ce procédé signifie un gain en espace (les sous-formules ne sont pas répétées) et un gain en temps (les comparaisons de formules deviennent des comparaisons d'entiers).
 
+
 \subsubsection{Fonctionnement}
 
-Une fois toutes les sous-formules nommées en commençant par les feuilles, la transformation rajoute des formules pour s'assurer que ces nouvelles variables sont équivalentes aux sous-formules qu'elles représentent. \\
+La transformation commence par nommer toutes les sous-formules en partant des feuilles. La nouvelle formule à satisfaire est alors la conjonction de la variable correspondant à la formule totale et de formules additionnelles qui garantissent que les nouvelles variables sont équivalentes aux sous-formules qu'elles représentent. \\
 
-On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}. En nommant les atomes on avait obtenu  $((a \wedge b) \vee c) \wedge d$. On introduit également $e$ pour la sous-formule $a \wedge b$, $f$ pour la sous-formule $e \vee c$ et $g$ pour la sous-formule $f \wedge d$ (qui est en fait toute la formule). La formule transformée devient donc $g \wedge D_e \wedge D_f \wedge D_g$ où les $D_\alpha$ sont des formules qui nous assure que $\alpha$ est équivalent à la formule qu'il représente. On a par exemple $D_e = (\neg a \vee \neg b \vee e) \wedge (\neg e \vee a) \wedge (\neg e \wedge b)$. \\
+On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}. En nommant les atomes on avait obtenu la formule $((a \wedge b) \vee c) \wedge d$. On introduit également $e$ pour la sous-formule $a \wedge b$, $f$ pour la sous-formule $e \vee c$ et $g$ pour la sous-formule $f \wedge d$ (qui est en fait toute la formule). La formule transformée devient donc $g \wedge D_e \wedge D_f \wedge D_g$ où les $D_\alpha$ sont des formules qui nous assure que $\alpha$ est équivalent à la formule qu'il représente. On a par exemple $D_e = (\neg a \vee \neg b \vee e) \wedge (\neg e \vee a) \wedge (\neg e \wedge b)$. \\
 
 Dans SMTCoq, au lieu de rajouter les formules $D_\alpha$, les sous-formules sont enregistrées dans un tableau: une nouvelle sous-formule peut faire référence à une sous-formule qui est à un indice précédent dans le tableau. 
 
+\subsection{Le vérificateur}
+
+Le vérificateur définit en Coq un type \textit{crule} qui représente les \textit{trule} ainsi qu'une fonction $checker$. Nous allons définir ces termes puis voir comment la combinaison des deux permet de reproduire la sémantique des certificats de veriT (\ref{sortie}).
 
 
-\subsection{Le type inductif \textit{crule}}\label{regroupement}
+\subsubsection{Le type inductif \textit{crule}}\label{regroupement}
 
-Une \textit{crule} est un type somme, chaque constructeur pouvant représenter alternativement l'une ou l'autre d'un ensemble de \textit{trule}. Chacun de ces constructeurs contient aussi paramètre de position utilisé par la fonction $checker$ (\ref{checker}). Par exemple, le constructeur $ImmBuildProj$ regroupe les règles $not\_implies0$ et $not\_implies1$ et contient aussi un paramètre de type \textit{int} (qui vaut donc 0 ou 1). Ce regroupement permet d'unifier le fonctionnement de règles similaires et donc de simplifier le traitement de ces règles dans la suite du code.
+Une \textit{crule} est un type somme, chaque constructeur pouvant représenter alternativement l'une ou l'autre d'un ensemble de \textit{trule}. Le constructeur $Res$ ne représente que la règle $resolution$ mais d'autres constructeurs peuvent représenter différentes règles en fonction de leurs paramètres. Par exemple, le constructeur $ImmBuildProj$ regroupe les règles $not\_implies0$ et $not\_implies1$ et contient aussi un paramètre de type \textit{int} qui vaut $0$ ou $1$ et qui indique quelle est la \textit{trule} représentée. Ce regroupement permet d'unifier le fonctionnement de règles similaires et donc de simplifier le traitement de ces règles dans la suite du code. \\
 
-\subsection{Le type Ocaml \textit{orule}}
+On appellera \textit{ccertif} la liste de toutes les \textit{crule} du certificat.
 
- Les \textit{orule} sont des enregistrements constitués, en plus du code Ocaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ $prev$ et un champ $next$. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ $used$ de type \textit{int} qui est utilisé par la fonction $alloc$ (\ref{alloc}).
 
-\subsection{La fonction récursive $checker$} \label{checker}
+\subsubsection{La fonction récursive $checker$} \label{checker}
 
-Le vérificateur contient une fonction Coq $checker$ qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui maintient un tableau de clauses appelé état (une clause est une disjonction de formules). À chaque appel de $checker$, une nouvelle \textit{crule} est consommée, $checker$ met alors à jour l'état courant.\\
+Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état. La fonction $checker$ implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisémment, $checker$ est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui modifie l'état. À chaque appel de $checker$, une nouvelle \textit{crule} $cr$ est consommée, $checker$ met alors à jour l'état courant en fonction de $cr$.\\
 
-À chaque constructeur $K$ de \textit{crule} correspond une fonction $scheckerK$ qui est appelée par $checker$ lorsque le constructeur $K$ est rencontré. $scheckerK$ donne une nouvelle clause valide à partir de celles déjà présentes dans l'état. La nouvelle clause est alors enregistrée dans l'état à la position indiquée par la \textit{crule}.\\
 
-Enfin $checker$ utilise un paramètre de position. Lorsque tous les calculs de mise à jour de \textit{crule} sont faits, $checker$ regarde à la position indiquée et renvoie $true$ si la clause est vide à cet endroit et $false$ sinon.
+
+\subsubsection{Théorème de correction}
+ 
+Le vérificateur repose sur le théorème de correction suivant :
+
+\[ \forall f \,\, \forall cc. \quad checker  \,\, cc \,\, f \, = \, true \quad \Rightarrow \quad interp \, \, f \]
+
+A FAIRE
+
+
 
 \subsection{Exemples de certificats et de vérificateurs}
 
@@ -513,18 +537,18 @@ A FAIRE
 
 La \textit{crule} $EqTr\,f_1\,...\,f_n\,f$ implémente la transitivité de l'égalité, $f_1$, ..., $f_n$ et $f$ doivent suivre le schéma de la transitivité : par exemple $f_1 = ~(a_1=a_2)$, $f_2= ~(a_2=a_3)$, ..., $f_n=~(a_n=a_{n+1})$ et $f = (a_1 = a_{n+1})$. Si c'est le cas alors le $schecker$ renvoie la clause $(f_1\,...\,f_n\,f)$, sinon le $schecker$ renvoie la clause $(true)$.
 
+\subsection{Le type Ocaml \textit{orule}}
+
+ Les \textit{orule} sont des enregistrements constitués, en plus du code Ocaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ $prev$ et un champ $next$. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ $used$ de type \textit{int} qui est utilisé par la fonction $alloc$ (\ref{alloc}).
+
+
 \subsection{Allocation dans le tableau état} \label{alloc}
+Chacun des constructeurs du type \textit{crule} contient aussi paramètre de position utilisé par la fonction $checker$ (\ref{checker}).
+
 
 L'état est représenté par un tableau de taille fixée. Cette taille est déterminée à partir du \textit{ocertif} par la fonction $alloc$ : il s'agit de calculer le nombre maximum de clauses à retenir à chaque étape du $checker$. La fonction $alloc$ assigne aussi une position à chaque \textit{orule} du \textit{ocertif} pour respecter cette valeur. Les clauses qui ne seront plus utilisées libèrent leur emplacement, de sorte que les nouvelles clauses peuvent utiliser ces nouveaux emplacements dans l'état. Cette méthode permet d'optimiser l'espace utilisé: il y a un gain de place par rapport à l'allocation naïve qui consiste à allouer un tableau de taille égale au nombre de règles.
 
 
-\subsection{Théorème de correction}
-
-Le vérificateur repose sur le théorème de correction suivant :
-
-\[ \forall l \, \forall t. \quad checker \, t = true \quad \Rightarrow \quad interp \, l \]
-
-A FAIRE
 
 
 
