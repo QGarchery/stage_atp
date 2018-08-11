@@ -586,13 +586,10 @@ On remarque que dans l'exemple précédent, le tableau d'état n'a pas besoin d'
     &\equiv true
 \end{align*}
 
-
-
-
 \newpage
 \section{Ajout de quantificateurs}
 
-Nous passons à la partie contribution personnelle. Dans cette partie on commence par voir comment veriT gère le cas des quantificateurs, puis on va voir comment ce fonctionnement peut être utilisé pour encoder l'utilisation de lemmes en forme prénexe sans utiliser de quantificateurs dans les \textit{crule}.
+Dans cette partie on commence par donner la forme générale des certificats de veriT dans le cas des lemmes quantifiés universellement. On explique ensuite comment ces certificats peuvent être encodés sans introduire de quantificateurs dans les \textit{crule}.
 
 \subsection{Instanciation d'un lemme par veriT}
 
@@ -634,25 +631,30 @@ mais cela demande de profonds changements des \textit{ccertif} et de leur utilis
 \item Il faut modifier le format des \textit{crule} pour accepter les formules quantifiées ce qui demande ensuite de raisonner dans Coq sur des termes à $\alpha$-équivalence près.
 \end{itemize}
 
+\subsection{Règle $same$}
 
-\subsection{Processing de la commande FORALLINST} \label{processing_forallinst}
+Il arrive que, à la suite de modifications des certificats, une règle devient inutile car son résultat est le même que celui d'une règle précédente. Pour la supprimer, il faut modifier tous les paramètres des règles suivantes pour qu'ils fassent référence à la première règle qui a ce même résultat. Cependant, faire cette modification à chaque fois que l'on veut supprimer une règle a une complexité quadratique. Pour remédier à ce problème, on introduit une nouvelle \textit{orule} $same$ qui est une règle qui dépend d'une seule autre règle. Dans un premier temps les règles à supprimer sont remplacées par des règles $same$ et un dictionnaire est créé afin d'associer à chaque règle $same$ la règle non-$same$ lui correspondant (associer une règle $same$ à sa dépendance retombe dans un comportement quadratique). Ensuite les règle $same$ sont supprimées et les paramètres des règles restantes sont modifiées en suivant le dictionnaire.
 
-Pour ces raisons, il est préférable de modifier les règles de la forme \\
-     (FORALLINST (or (not lemma) lemma\_inst) id)\\
-où lemma est un des lemmes rajoutés par l'utilisateur et lemma\_inst est une instance de ce même lemme en une règle \\
+\subsection{Transformation de la règle $forall\_inst$} \label{processing_forallinst}
 
-(FORALLINST (lemma\_inst) id).\\
+Pour ces raisons, il est préférable de modifier les règles de la forme
+\[id:(forall\_inst \,\,(or \,\, (not \,\,lemma) \,\,lemma\_inst) \,\,id\_lemma)\]
+où lemma est un des lemmes rajoutés par l'utilisateur et lemma\_inst est une instance de ce même lemme en une règle
+\[id:(forall\_inst \,\,(lemma\_inst) \,\, id\_lemma)\]
 
-Il faut aussi modifier les règles suivantes qui utilisent cette règle. La règle OR devient une règle SAME qui pointe vers la règle FORALLINST. Pour la règle RESOLUTION qui dépend de la règle FORALLINST et de la règle OR, on enlève la dépendance à OR. Dans le cas où il ne reste plus qu'une dépendance la règle RESOLUTION devient une règle SAME. Pour l'exemple de la figure instance1, cela donne : \\
+Il faut aussi modifier les règles suivantes qui dépendent du résultat de cette règle. Pour la règle $resolution$ qui dépend de la règle $forall\_inst$ la règle $input$ qui contient le lemme, on enlève la dépendance à cette règle $input$. Dans le cas où il ne reste plus qu'une seule dépendance, la règle $resolution$ devient une règle $same$. En reprenant l'exemple de la section précédente, on obtient: 
+\begin{align*}
+0&:(input\,\, (forall \,\,x, \,\, f (x+1) = f(x) + 7)) \\
+1&:(forall\_inst \,\,(f (2+1) = f(2) + 7) \,\,0) \\
+2&:(same\,\, (f(2+1) = f(2) + 7) \,\,1) 
+\end{align*}
 
-A:(INPUT (forall x, f (x) = 3)) \\
-B:(FORALLINST (f (2) = 3) A) \\
-C:(SAME (f(2) = 3) B) \\
-D:(SAME (f(2) = 3) C) \\
+
+\subsection{La \textit{crule} $Forallinst$ et preuve du théorème de correction}
 
 Pour prouver que le nouveau scertif associé à cette règle qui a pour conclusion lemma\_inst est correct il faudra utiliser le théorème donné en id (voir partie ????).\\
 
-A FAIRE : expliquer SAME
+
 
 
 \section{Instanciation de lemmes} \label{instanciations}
@@ -665,7 +667,7 @@ A FAIRE : expliquer SAME
 
 A FAIRE : rédiger cette section
 
-
+\subsection{La \textit{crule} $Qf\_lemma$}
 
 \subsection{Preuves d'instanciation}
 
