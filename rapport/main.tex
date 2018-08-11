@@ -131,7 +131,7 @@ Ces améliorations de l'expressivité et de l'efficacité combinées avec la fac
 
 Les assistants de preuves sont des outils puissants qui permettent d'exprimer des théorèmes complexes puis de les vérifier de manière interactive. Ils proposent à un utilisateur de formuler son problème puis de le démontrer, le rôle principal de l'assistant de preuve étant alors de vérifier que la preuve fournie est correcte. Pour une propriété donnée, l'utilisateur doit donc fournir une preuve parfaitement rigoureuse et exhaustive de la propriété ce qui peut rendre le processus de vérification long et fastidieux. La confiance accordée à ces outils dépend de la compréhension que l'on peut avoir dans son noyau, étant donné que c'est la partie sur laquelle repose la vérification. Cette compréhension est facilitée lorsque l'implantation de la logique de ce noyau est de taille réduite. \\
 
-Dans la suite nous utiliserons Coq comme assistant de preuve. La logique de son noyau se fonde sur le calcul des constructions inductives \cite{coq_intro}. La sémantique du langage n'est pas donnée en détail dans ce rapport mais les aspects importants seront précisés au moment de leur utilisation. La partie \ref{coq} introduit deux techniques d'utilisation de Coq.
+Dans la suite nous utiliserons Coq comme assistant de preuve. La logique de son noyau se fonde sur le calcul des constructions inductives \cite{coq_intro}. La sémantique du langage n'est pas donnée en détail dans ce rapport mais les aspects importants seront précisés au moment de leur utilisation. La partie \ref{coq} introduit deux techniques d'utilisation de Coq. 
 
 \subsection{Prouveurs automatiques}\label{prouveurs}
 
@@ -148,8 +148,14 @@ Nous utiliserons différents prouveurs automatiques (voir partie \ref{fonctionne
 
 Une interface entre assistant de preuve et prouveurs automatiques telle que SMTCoq offre les avantages décrits ci-dessus des deux types de logiciels formels. Un autre avantage de SMTCoq est sa modularité : il est en effet possible de rajouter d'autres prouveurs automatiques, ceux-ci n'étant pas nécessairement du même type (prouveurs SAT/SMT) et n'ayant pas nécessairement le même format d'entrée ni le même format de sortie. \\
 
-Pendant ce stage j'ai travaillé sur SMTCoq. J'ai notamment eu l'occasion de modifier le code du projet qui est actuellement développé par Chantal Keller en collaboration avec l'université de l'Iowa. 
+Pendant ce stage j'ai travaillé sur SMTCoq. J'ai notamment eu l'occasion de modifier le code du projet qui est actuellement développé par Chantal Keller en collaboration avec l'université de l'Iowa. \\
 
+Les fragments de code Coq fournis sont compilables lorsqu'ils sont chargés dans l'environnement de SMTCoq. Il faut donc les préfacer par
+\begin{lstlisting}[frame=single]
+  Require Import SMTCoq Bool.
+  Open Scope Z_scope.
+\end{lstlisting}
+Cela requiert l'installation de SMTCoq, disponible sur \textit{github.com/smtcoq/smtcoq}.
 
 
 \newpage
@@ -169,8 +175,8 @@ Prenons l'exemple des formules conjonctives :
 
 \begin{lstlisting}[frame=single]
 Inductive AndTree :=
-  And (_ _: AndTree)
-| Bool (_ : bool).
+  Bool (_ : bool)
+| And (_ _: AndTree).
 \end{lstlisting}
 
 et définissons un type inductif qui donne son évaluation : 
@@ -198,7 +204,7 @@ Proof.
 Qed.
 \end{lstlisting}
 
-\subsubsection{Définitions en Coq}
+\subsubsection{Définitions en Coq et convertibilité}
 
 La réflexion calculatoire repose sur la convertibilité de deux termes: deux termes sont convertibles lorsqu'ils se réduisent vers un même terme. Aussi, à chaque nouvelle définition, la nouvelle constante qui est définie est convertible à sa définition. \\
 
@@ -212,7 +218,6 @@ Fixpoint evaluation (t : AndTree) :=
   
 Proposition Eval_eq_eval t b :
   Evaluation t b <-> evaluation t = b.
-  
 \end{lstlisting}
 
 L'avantage de cette nouvelle définition de l'évaluation est que, grâce à la convertibilité de $evaluation$ avec sa définition, on a une preuve triviale de la propriété.
@@ -223,7 +228,18 @@ Proof.
 Qed.
 \end{lstlisting}
 
-Ce fonctionnement peut être exploité pour construire des preuves qui reposent sur un calcul effectué en Coq. 
+En effet, en notant $a \equiv b$ lorsque $a$ est convertible à $b$, on a :
+\begin{align*}
+  evaluation \,\,t \equiv \,\, &evaluation\,\, (And \,\,(Bool \,\,true) \,\,(Bool \,\,false)) \,\,\&\& \,\, \\
+  \,\, &evaluation\,\, (And \,\,(Bool\,\, true) \,\,(Bool\,\, true)) \\
+  \equiv \,\, &(evaluation \,\,(Bool \,\,true) \,\,\&\&\,\, evaluation \,\,(Bool \,\,false)) \,\,\&\&\,\, \\
+  &(evaluation\,\, (Bool \,\,true) \,\,\&\&\,\, evaluation \,\,(Bool\,\, true)) \\
+  \equiv \,\, &(true \,\,\&\&\,\, false) \,\,\&\&\,\, (true \,\,\&\&\,\, true) \\
+  \equiv\,\, &false \,\,\&\&\,\, (true \,\,\&\&\,\, true) \\
+  \equiv\,\, &false
+\end{align*}  
+
+Ce fonctionnement peut être exploité pour construire des preuves qui reposent sur un calcul de convertibilité de termes Coq.
 
 
 \subsection{Réification} \label{reification}
@@ -368,6 +384,8 @@ Pour manipuler ces clauses, veriT peut utiliser une règle $resolution$. La règ
 1&:(input \,\, (not \,\, (>= \,\,x \,\,0))) \\
 2&:(resolution \,\,() \,\,0\,\, 1)
 \end{align*}
+
+A FAIRE : Chaîne de résolution
 
 
 \subsubsection{Règles $not\_implies0$ et $not\_implies1$} \label{not_implies}
@@ -533,21 +551,24 @@ Une fois celui-ci démontré, la preuve est obtenue en l'appliquant à la réfle
 
 \subsubsection{Exemple de l'identité}
 
-Considérons le but Coq, $implb \,\, A \,\, A = true$ où $implb$ est l'implication booléenne et appliquons la tactique $verit$. Puisque c'est la négation du but qui est envoyée à veriT, on obtient le \textit{tcertif} de \ref{not_implies}. Celui-ci est traduit par SMTCoq en un \textit{ccertif} : 
-$cc = [ImmBuildProj \,\, 0 \,\, 0; \,ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] $ et le tableau d'état est initialisé à $t = [| nid; nid; nid; nid|]$ où $nid$ est la clause $( \neg (A \Rightarrow A))$. \\
-
+Considérons le but Coq suivant où $implb$ est l'implication booléenne:
+\begin{lstlisting}[frame=single]
+  Lemma identity A : implb A A.
+\end{lstlisting}  
+Lorsqu'on applique $verit$, puisque c'est la négation du but qui est envoyée, le prouveur automatique nous renvoie le \textit{tcertif} de \ref{not_implies}. Celui-ci est traduit par SMTCoq en un \textit{ccertif} $cc$ et l'état est initialisé en un tableau $t$ : 
+$cc = [ImmBuildProj \,\, 0 \,\, 0; \,ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] $ et $t = [|nid; nid; nid; nid|]$ où $nid$ est la clause $( \neg (A \Rightarrow A))$.
 \begin{align*}
-    checker \,\, cc \,\, t &= checker \,\, [ImmBuildProj \,\, 0 \,\, 0; \,ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] \,\, [| nid; nid; nid; nid|] \\
-    &= checker \,\, [ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] \,\, [| nid; (A); nid; nid|] \\
-    &= checker \,\, [Res \,\, 1 \,\, 2] \,\, [| nid; (A); (\neg A); nid|] \\
-    &= checker \,\, [] \,\, [| nid; (A); (\neg A); ()|] \\
-    &= true
+    checker \,\, cc \,\, t &\equiv checker \,\, [ImmBuildProj \,\, 0 \,\, 0; \,ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] \,\, [| nid; nid; nid; nid|] \\
+    &\equiv checker \,\, [ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \,\, 2] \,\, [| nid; (A); nid; nid|] \\
+    &\equiv checker \,\, [Res \,\, 1 \,\, 2] \,\, [| nid; (A); (\neg A); nid|] \\
+    &\equiv checker \,\, [] \,\, [| nid; (A); (\neg A); ()|] \\
+    &\equiv true
 \end{align*}
-En appliquant le théorème de correction, on obtient $\neg (evaluation (\neg (A \Rightarrow A)))$, soit $\neg \neg (implb\,\, A \,\,A = true)$. On a vu que (\ref{negation}), dans le cadre de SMTCoq, on pouvait se ramener à $implb \,\, A \,\, A = true$.
+En appliquant le théorème de correction, on obtient $\neg (evaluation (\neg (A \Rightarrow A)))$, soit $\neg \neg (implb\,\, A \,\,A)$. On a vu que (\ref{negation}), dans le cadre de SMTCoq, on pouvait se ramener à $implb \,\, A \,\, A$.
 
 \subsection{Le pré-processeur}
 
-Les avantages d'une étape intermédiaire de compilation des certificats sont multiples (\ref{des_certificats}). Nous détaillons le format utilisé puis nous donnons une application directe de cette étape.
+Les avantages d'une étape intermédiaire de compilation des certificats sont multiples (\ref{des_certificats}). Nous détaillons le format utilisé puis nous donnons une optimisation rendue possible par cette étape.
 
 \subsubsection{Le type Ocaml \textit{orule}}
 
@@ -557,13 +578,12 @@ Les avantages d'une étape intermédiaire de compilation des certificats sont mu
 \subsubsection{Allocation dans le tableau état} \label{alloc}
 
 On remarque que dans l'exemple précédent, le tableau d'état n'a pas besoin d'être aussi grand : 2 emplacements suffisent pour ce certificat. Pour réduire l'espace mémoire utilisé, il faut calculer le nombre maximum de clauses à retenir à chaque étape du $checker$, c'est ce que fait la fonction $alloc$. La taille du tableau d'état est fixé à cette valeur. Cette fonction assigne aussi une position dans un nouveau paramètre des \textit{orule}. Nous noterons ce paramètre de position au début, de sorte que lorsque $checker$ rencontre la \textit{crule} $ImmBuildProj \,\, 0\,\, 1 \,\, 2$, la case $0$ de l'état est modifiée en $\neg Y$ si la case $2$ de l'état contient $\neg(X \Rightarrow Y)$. Puisque les emplacements des clauses sont modifiés, il faut aussi modifier les dépendances des règles. Enfin, $checker$ prend un paramètre qui indique quelle est la position de la dernière règle, le résultat la dernière règle n'étant pas nécessairement au dernier emplacement du tableau d'état.  
-
 \begin{align*}
-    checker \,\, cc \,\, t \,\, 0 &= checker \,\, [ImmBuildProj \,\, 0\,\, 0 \,\, 0; \,ImmBuildProj \,\, 1\,\, 1 \,\, 1; \, Res \,\, 0 \,\, 0 \,\, 1] \,\, [| nid; nid|] \,\, 0 \\
-    &= checker \,\, [ImmBuildProj \,\, 1 \,\, 1 \,\, 1; \, Res \,\, 0 \,\, 0 \,\, 1] \,\, [| (A); nid|] \,\, 0 \\
-    &= checker \,\, [Res \,\, 0 \,\, 0 \,\, 1] \,\, [| (A); (\neg A)|] \,\, 0 \\
-    &= checker \,\, [] \,\, [| (); (\neg A)|] \,\, 0 \\
-    &= true
+    checker \,\, cc \,\, t \,\, 0 &\equiv checker \,\, [ImmBuildProj \,\, 0\,\, 0 \,\, 0; \,ImmBuildProj \,\, 1\,\, 1 \,\, 1; \, Res \,\, 0 \,\, 0 \,\, 1] \,\, [| nid; nid|] \,\, 0 \\
+    &\equiv checker \,\, [ImmBuildProj \,\, 1 \,\, 1 \,\, 1; \, Res \,\, 0 \,\, 0 \,\, 1] \,\, [| (A); nid|] \,\, 0 \\
+    &\equiv checker \,\, [Res \,\, 0 \,\, 0 \,\, 1] \,\, [| (A); (\neg A)|] \,\, 0 \\
+    &\equiv checker \,\, [] \,\, [| (); (\neg A)|] \,\, 0 \\
+    &\equiv true
 \end{align*}
 
 
@@ -572,35 +592,39 @@ On remarque que dans l'exemple précédent, le tableau d'état n'a pas besoin d'
 \newpage
 \section{Ajout de quantificateurs}
 
+Nous passons à la partie contribution personnelle. Dans cette partie on commence par voir comment veriT gère le cas des quantificateurs, puis on va voir comment ce fonctionnement peut être utilisé pour encoder l'utilisation de lemmes en forme prénexe sans utiliser de quantificateurs dans les \textit{crule}.
 
 \subsection{Instanciation d'un lemme par veriT}
 
-Considérons le but Coq suivant: \\
+Considérons la proposition Coq suivante: 
 
-A FAIRE : schéma du but : instance1 f (3) = f(2) + 7 avec comme lemme initial forall x, f (x+1) = f(x) + 7 \\
+\begin{lstlisting}[frame=single]
+Lemma instance_2 f : 
+  (forall x, f (x+1) =? f x + 7) ->
+  f 3 =? f 2 + 7.
+\end{lstlisting}
 
 Lorsqu'un lemme en forme prénexe est donné par une règle $input$, veriT peut instancier ce lemme avec la règle $forall\_inst$: 
 \begin{align*}
 0&:(input \,\,(forall\,\, x,\,\, f (x+1) = f(x)+7) \\
-1&:(forall\_inst \,\,((not \,\,(forall\,\, x, \,\,f (x+1) = f(x)+7)) \,\,(f (3) = f(2)+7)) )\\
-2&:(resolution  \,\, (f (3) = f(2)+7) \,\,1 \,\,0) 
+1&:(forall\_inst \,\,((not \,\,(forall\,\, x, \,\,f (x+1) = f(x)+7)) \,\,(f (2+1) = f(2)+7)) )\\
+2&:(resolution  \,\, (f (2+1) = f(2)+7) \,\,1 \,\,0) 
 \end{align*}
-On remarquera que la règle $forall\_inst$ ne dépend d'aucune autre règle. L'utilisation de la règle $2$ passe par la règle $resolution$ numérotée $3$.\\
+On remarquera que la règle $forall\_inst$ ne dépend d'aucune autre règle et que l'utilisation de son résultat passe une règle $resolution$.\\
 
-
-On fera attention ici, que même si ce schéma fait clairement apparaître la dépendance de $forall\_inst$ au théorème donné en $0$, cette dépendance est perdue dans la suite du certificat. En effet, dans une règle de résolution qui a plus que 2 dépendances, retrouver le théorème et son instanciation demande, a priori, d'unifier des formules contenues dans une règle $forall\_inst$ et dans une règle $input$. De plus, veriT fait un renommage des variables liées dans le théorème (l'exemple complet est présenté dans l'annexe \ref{annexe_instanciation}). Une solution à ce problème est d'utiliser le hash-consing de veriT et d'enregistrer la dépendance. La règle $2$ devient : 
+Ici la dépendance de la règle $forall\_inst$ au lemme donné dans la règle $input$ est évidente pour plusieurs raisons : le certificat est de petite taille, il y a égalité syntaxique entre le lemme et une sous-formule du résultat de la règle $forall\_inst$, la règle de résolution qui utilise la règle $forall\_inst$ est située juste juste après celle-ci et a exactement 2 dépendances. Cependant, dans le cas général, aucune de ces raisons ne reste valide. En particulier, veriT fait un renommage des variables liées qui apparaissent dans les lemmes (l'exemple complet est présenté dans l'annexe \ref{annexe_instanciation}). Retrouver la dépendance demande donc, a priori, d'unifier à $\alpha$-équivalence près des formules contenues dans une règle $forall\_inst$ et dans les règles $input$. Heureusement, veriT fait un \textit{hash-consing} des formules qui apparaissent dans les \textit{tcertif}. Cela nous permet d'enregistrer la dépendance au lemme dans la règle $forall\_inst$. La règle $2$ devient: 
 \begin{align*}
 2:(forall\_inst \,\, (or\,\, (not \,\,(forall \,\,x, \,\,f (x+1) = f(x)+7)) \,\,(f (3) = f(2)+7))) \,\,0) 
 \end{align*}
 
 
 \subsection{Logique de veriT et de Coq}
-veriT utilise la logique classique. Ainsi, la proposition 
+On a vu que veriT utilise des clauses de la forme: 
 \[  \neg (\forall \, x, \, P(x)) \vee (P \, (n)) \]
 
-est une tautologie pour tout prédicat $P$ et toute valeur $n$. \\
+Une telle clause est une tautologie pour tout prédicat $P$ et toute valeur $n$ en logique classique. \\
 
-Cependant dans la logique intuitionniste de Coq ce n'est plus vrai. Une solution serait de remplacer cette proposition par 
+Cependant, dans la logique intuitionniste de Coq ce n'est plus vrai. Une solution serait de remplacer cette clause par la formule:
 
 \[   (\forall \, x, \, P(x)) \Rightarrow (P \, (n)) \]
 mais cela demande de profonds changements des \textit{ccertif} et de leur utilisation par le vérificateur : 
@@ -711,8 +735,8 @@ On donne ici deux définitions, la preuve de leur équivalence, la mise en forme
 Require Import Bool.
 
 Inductive AndTree :=
-  And (_ _: AndTree)
-| Bool (_ : bool).
+  Bool (_ : bool)
+| And (_ _: AndTree).
 
 Inductive Evaluation : AndTree -> bool -> Prop :=
   EvalBool b :
@@ -734,23 +758,23 @@ Qed.
 
 Fixpoint evaluation (t : AndTree) :=
   match t with
-    And t1 t2 => evaluation t1 && evaluation t2
-  | Bool n => n
+    Bool n => n
+  | And t1 t2 => evaluation t1 && evaluation t2
   end.
 
 Proposition Eval_eq_eval t b :
   Evaluation t b <-> evaluation t = b.
 Proof.  
-  revert b. induction t as [t1 IHt1 t2 IHt2 | a]; simpl; intro b.
+  revert b. induction t as [a | t1 IHt1 t2 IHt2]; simpl; intro b.
+  -split; intro H.
+   +now inversion H.
+   +rewrite H. apply EvalBool.
   -split; intro H.
    +inversion H.
     apply IHt1 in H2; rewrite H2.
     now apply IHt2 in H3; rewrite H3.
    +eapply EvalAnd. now apply IHt1.
     now apply IHt2. assumption.
-  -split; intro H.
-   +now inversion H.
-   +rewrite H. apply EvalBool.
 Qed.
    
 Lemma eval_t_false : evaluation t = false.
@@ -796,17 +820,17 @@ Lemma append_eqt t1 t2:
   eqt (append t1 t2) (And t1 t2).
 Proof.
   revert t2. induction t1; intro t2; simpl.
+  -apply refl.
   -eapply trans. apply IHt1_1. eapply trans. eapply congru.
    apply refl. apply IHt1_2. apply assoc.
-  -apply refl.
 Qed.
 
 Lemma peigne_eqt t :
   eqt (peigne t) t.
 Proof.
   induction t; simpl.
-  -eapply trans. apply append_eqt. now apply congru.
   -apply refl.
+  -eapply trans. apply append_eqt. now apply congru.
 Qed.
 
 Lemma peigne_correct t :
@@ -878,11 +902,11 @@ on obtient $unsat$ et la preuve dans un fichier contenant :
 \end{lstlisting}
 
 
-\subsection{Instanciation de lemmes et transformations de veriT} \label{annexe_simplifications}
+\subsection{Preuves d'dnstanciation de lemmes et transformations de veriT} \label{annexe_simplifications}
 
 \lstset{language=coq}
 \begin{lstlisting}[frame=single]
-Require Import Bool.
+Require Import SMTCoq Bool.
 Open Scope Z_scope.
 
 (* verit silently transforms an <implb a b> into a <or (not a) b> when
