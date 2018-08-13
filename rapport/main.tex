@@ -98,8 +98,9 @@ Les méthodes formelles s'étendent à la preuve de programme: il s'agit alors d
 
 \subsection{Problème étudié}
 
-Parmi ces logiciels formels, on s'intéressera aux assistants de preuves (\ref{assistants}) et aux prouveurs automatiques (\ref{prouveurs}) et plus particulièrement aux interfaces entre un assistant de preuve et différents prouveurs automatiques.  De telles interfaces permettent d'améliorer l'automatisation de l'assistant de preuve considéré. En effet, les preuves générées automatiquement par les prouveurs sont ensuite utilisées pour créer des preuves dans l'assistant de preuve. Cette approche est utilisée par Coqhammer \cite{coqhammer} pour Coq et par Sledgehammer \cite{sledgehammer_manual} pour Isabelle. \\
-Pendant mon stage, j'ai travaillé sur SMTCoq qui sert aussi d'interface à différents prouveurs automatiques mais qui a la particularité de reconstruire fidèlement, en Coq, les preuves générées par les prouveurs automatiques. Cette approche permet également de vérifier les certificats fournis par les prouveurs et donc d'augmenter la confiance que l'on a dans ces outils.\\
+Parmi ces logiciels formels, on s'intéressera aux assistants de preuves (\ref{assistants}) et aux prouveurs automatiques (\ref{prouveurs}) et plus particulièrement aux interfaces entre un assistant de preuve et différents prouveurs automatiques. De telles interfaces façonnent une preuve à partir du certificat fourni par un des prouveurs automatiques, ce qui améliore l'automatisation de l'assistant de preuve considéré. Cette approche est utilisée par Coqhammer \cite{coqhammer} pour Coq et par Sledgehammer \cite{sledgehammer_manual} pour Isabelle.
+
+Pendant mon stage, j'ai travaillé sur SMTCoq qui sert aussi d'interface à différents prouveurs automatiques mais qui a la particularité de reproduire fidèlement, en Coq, le certificat reçu. Cette approche permet également de vérifier les certificats fournis par les prouveurs et donc d'augmenter la confiance que l'on a dans ces outils.\\
 
 Nous aimerions que le développement qui s'appuie sur cette automatisation soit adapté aux assistants de preuves: les preuves sont modulaires et peuvent reposer sur des lemmes précédemment démontrés. Nous voudrions aussi pouvoir formaliser une théorie en partant des axiomes de celle-ci puis démontrer automatiquement de nouvelles propriétés de cette théorie.
 
@@ -110,14 +111,17 @@ Pendant mon stage, je me suis attaché à améliorer l'expressivité de SMTCoq d
 
 \subsection{Arguments en faveur de la validité de la contribution}
 
-En plus des tests présents dans SMTCoq initialement, le code final passe d'autres tests pour s'assurer du gain d'expressivité dû au rajout des lemmes et des quantificateurs. J'ai, par exemple, pu vérifier des propriétés, automatiquement et dans Coq, en théorie des groupes, dans une théorie formalisant les listes d'entiers, sur des fonctions définies récursivement, etc. \\ 
-D'autre part, ma contribution respecte le principe sceptique de SMTCoq (\ref{sceptique_autarcique}), le développement et le calcul sont faits principalement en Ocaml, en dehors de l'assistant de preuve. Cet aspect donne une meilleure robustesse à SMTCoq face aux changements internes des prouveurs automatiques.
+En plus des tests présents dans SMTCoq initialement, le code final passe d'autres tests pour s'assurer du gain d'expressivité dû au rajout des lemmes et des quantificateurs. J'ai, par exemple, pu vérifier des propriétés, automatiquement et dans Coq, en théorie des groupes, dans une théorie formalisant les listes d'entiers, sur des fonctions définies récursivement, etc.
+
+D'autre part, ma contribution respecte le principe sceptique de SMTCoq (\ref{sceptique_autarcique}), le développement et le calcul étant faits principalement en Ocaml, en dehors de l'assistant de preuve. Cet aspect donne une meilleure robustesse à SMTCoq face aux changements internes des prouveurs automatiques.
 
 
 \subsection{Bilan et perspectives}\label{persp}
 
-Un des buts que l'on souhaite poursuivre est de certifier le logiciel de vérification Why3 \cite{why3_intro}. Puisque Why3 utilise des prouveurs automatiques, il faut alors pouvoir certifier les démonstrations faites par ces prouveurs. Ce sujet est lié à celui de ma thèse intitulée "Certification de la génération et la transformation d'obligations de preuves" et encadrée par Claude Marché, Chantal Keller et Andrei Paskevich. À cette occasion, j'utiliserai SMTCoq et je profiterai de l'amélioration de son expressivité due à mon stage. Je pourrai l'améliorer encore afin d'accepter des quantificateurs dans n'importe quelle position dans la formule.\\
-L'expressivité peut également être améliorée en considérant les termes concrets du type des propositions dans Coq en plus de ceux du type des booléens. \\
+Un des buts que l'on souhaite poursuivre est de certifier le logiciel de vérification Why3 \cite{why3_intro}. Puisque Why3 utilise des prouveurs automatiques, il faut alors pouvoir certifier les démonstrations faites par ces prouveurs. Ce sujet est lié à celui de ma thèse intitulée "Certification de la génération et la transformation d'obligations de preuves" et encadrée par Claude Marché, Chantal Keller et Andrei Paskevich. À cette occasion, j'utiliserai SMTCoq et je profiterai de l'amélioration de son expressivité due à mon stage. Je pourrai l'améliorer encore en étendant le format des lemmes que l'on peut transmettre à SMTCoq.
+
+L'expressivité peut également être améliorée en considérant les termes concrets du type des propositions dans Coq en plus de ceux du type des booléens.
+
 On pourrait aussi utiliser des méthodes de \textit{machine learning} pour sélectionner les lemmes à envoyer au prouveur automatique comme c'est fait dans Coqhammer et Sledgehammer \cite{hol_selector, coqhammer}. L'avantage étant qu'avec des lemmes pertinents et en petit nombre le prouveur automatique trouve plus rapidement et plus souvent la preuve du théorème en question.\\
 
 Ces améliorations de l'expressivité et de l'efficacité combinées avec la facilité d'utilisation et la robustesse de SMTCoq ont pour objectifs d'en faire un outil accessible et de généraliser son utilisation dans les projets développés en Coq.
@@ -129,9 +133,9 @@ Ces améliorations de l'expressivité et de l'efficacité combinées avec la fac
 
 \subsection{Assistants de preuve}\label{assistants}
 
-Les assistants de preuves sont des outils puissants qui permettent d'exprimer des théorèmes complexes puis de les vérifier de manière interactive. Ils proposent à un utilisateur de formuler son problème puis de le démontrer, le rôle principal de l'assistant de preuve étant alors de vérifier que la preuve fournie est correcte. Pour une propriété donnée, l'utilisateur doit donc fournir une preuve parfaitement rigoureuse et exhaustive de la propriété ce qui peut rendre le processus de vérification long et fastidieux. La confiance accordée à ces outils dépend de la compréhension que l'on peut avoir dans son noyau, étant donné que c'est la partie sur laquelle repose la vérification. Cette compréhension est facilitée lorsque l'implantation de la logique de ce noyau est de taille réduite. \\
+Les assistants de preuves sont des outils puissants qui permettent d'exprimer des théorèmes complexes puis de les vérifier de manière interactive. Ils proposent à un utilisateur de formuler son problème puis de le démontrer, le rôle principal de l'assistant de preuve étant alors de vérifier que la preuve fournie est correcte. Pour une propriété donnée, l'utilisateur doit donc construire une preuve parfaitement rigoureuse et exhaustive de la propriété ce qui peut rendre le processus de vérification long et fastidieux. La confiance accordée à ces outils dépend de la compréhension que l'on peut avoir dans son noyau, étant donné que c'est la partie sur laquelle repose la vérification. Cette compréhension est facilitée lorsque l'implantation de la logique de ce noyau est de taille réduite. \\
 
-Dans la suite nous utiliserons Coq comme assistant de preuve. La logique de son noyau se fonde sur le calcul des constructions inductives  \cite{coq_intro}. La sémantique du langage n'est pas donnée en détail dans ce rapport mais les aspects importants seront précisés au moment de leur utilisation. La partie \ref{coq} introduit deux techniques d'utilisation de Coq. 
+Dans la suite nous utiliserons Coq comme assistant de preuve. La logique de son noyau se fonde sur le calcul des constructions inductives \cite{coq_intro} (ou types inductifs). La sémantique du langage n'est pas donnée en détail dans ce rapport mais les aspects importants seront précisés au moment de leur utilisation. La partie \ref{coq} introduit deux techniques d'utilisation de Coq. 
 
 \subsection{Prouveurs automatiques}\label{prouveurs}
 
@@ -142,11 +146,12 @@ La partie \ref{fonctionnement_prouveurs} détaille le fonctionnement des prouveu
 
 \subsection{SMTCoq}
 
-Une interface entre assistant de preuve et prouveurs automatiques telle que SMTCoq offre les avantages décrits ci-dessus des deux types de logiciels formels. Un autre avantage de SMTCoq est sa modularité: il est en effet possible de rajouter d'autres prouveurs automatiques, ceux-ci n'étant pas nécessairement du même type (prouveurs SAT/SMT) et n'ayant pas nécessairement le même format d'entrée ni le même format de sortie. \\
+Une interface entre assistant de preuve et prouveurs automatiques telle que SMTCoq offre les avantages des deux types de logiciels formels décrits ci-dessus. Un autre avantage de SMTCoq est sa modularité: il est en effet possible de rajouter d'autres prouveurs automatiques, ceux-ci n'étant pas nécessairement du même type (prouveurs SAT/SMT) et n'ayant pas nécessairement le même format d'entrée ni le même format de sortie. \\
 
-Pendant ce stage j'ai travaillé sur SMTCoq. J'ai notamment eu l'occasion de modifier le code du projet qui est actuellement développé par Chantal Keller en collaboration avec l'université de l'Iowa. \\
 
-Les fragments de code Coq fournis sont compilables lorsqu'ils sont chargés dans l'environnement de SMTCoq. Il faut donc les préfacer par
+La partie \ref{pres_smtcoq} présente SMTCoq qui est l'objet du stage et qui est un projet actuellement développé par Chantal Keller en collaboration avec l'université de l'Iowa. \\
+
+Les fragments de code Coq fournis sont encadrés et sont compilables lorsqu'ils sont chargés dans l'environnement de SMTCoq. Il faut donc les préfacer par
 \begin{lstlisting}[frame=single]
   Require Import SMTCoq Bool.
   Open Scope Z_scope.
@@ -204,7 +209,7 @@ Qed.
 
 La réflexion calculatoire repose sur la convertibilité de deux termes: deux termes sont convertibles lorsqu'ils se réduisent vers un même terme. Aussi, à chaque nouvelle définition, la nouvelle constante qui est définie est convertible à sa définition. \\
 
-Plutôt que d'utiliser un prédicat qui prend une formule conjonctive $t$ et un booléen $b$, et qui vérifie que $t$ s'interprète en $b$, on peut définir une fonction récursive qui calcule l'interprétation et combiner cette fonction avec le prédicat de l'égalité. On peut ensuite montrer que les deux formalisations sont bien équivalentes.  
+Plutôt que d'utiliser un prédicat qui prend une formule conjonctive $t$ et un booléen $b$, et qui énonce que $t$ s'interprète en $b$, on peut définir une fonction récursive qui calcule l'interprétation et combiner cette fonction avec le prédicat de l'égalité. On peut ensuite montrer que les deux formalisations sont bien équivalentes.  
 \begin{lstlisting}[frame=single]
 Fixpoint interp (t : AndTree) :=
   match t with
@@ -216,7 +221,7 @@ Proposition Interp_eq_interp t b :
   Interp t b <-> interp t = b.
 \end{lstlisting}
 
-L'avantage de cette définition de l'interprétation par rapport au type inductif est que, grâce à la convertibilité de $interp$ à sa définition, on a une preuve triviale de la propriété.
+L'avantage de cette définition de l'interprétation par rapport au type inductif est que, grâce à la convertibilité de $interp$ à sa définition, on a une preuve triviale du lemme précédent.
 \begin{lstlisting}[frame=single]
 Lemma interp_t_false : interp t = false.
 Proof.
@@ -242,18 +247,16 @@ Ce fonctionnement peut être exploité pour construire des preuves qui reposent 
 
 \subsubsection{\textit{Embeddings}}
 
-La réification est le fait de passer d'un \textit{shallow-embedding} à un \textit{deep-embedding}. \\
+La réification est le fait de passer d'un \textit{shallow-embedding} à un \textit{deep-embedding}. Dans le cas du \textit{deep-embedding}, un terme est représenté dans un nouvel AST ce qui met en évidence sa structure. À l'inverse, un \textit{shallow-embedding} du même terme est traduit directement vers sa valeur dans le langage cible. \\
 
-Dans le cas du \textit{deep-embedding}, un terme est représenté dans un nouvel AST ce qui met en évidence sa structure. À l'inverse, un \textit{shallow-embedding} du même terme est traduit directement vers sa valeur dans le langage cible. \\
-
-Reprenons l'exemple des formules conjonctives et considérons la formule $ u = (b_1 \,\&\, b_2) \,\&\, (b_3 \,\&\, b4)$. À l'instar de la section précédente, le \textit{deep-embedding} de $u$ est donné dans le type $AndTree$:
+Reprenons l'exemple des formules conjonctives et considérons la formule $ u := (b_1 \wedge b_2) \wedge (b_3 \wedge b4)$. À l'instar de la section précédente, le \textit{deep-embedding} de $u$ est donné dans le type $AndTree$:
 \[And\,(And\,(Bool\,b1)\,(Bool\,b2))\,(And\,(Bool\,b3)\,(Bool\,b4))\] 
 et son \textit{shallow-embedding} peut être donné en utilisant la conjonction booléenne de Coq: 
 \[(b1\,\&\&\,b2)\,\&\&\,(b3\,\&\&\,b4) \]
 
 Dans la suite, on s'intéresse au problème de mettre des formules booléennes conjonctives en forme de peigne. Avec $b_1, b_2, b_3, b_4$ des termes de type $bool$, on veut, par exemple, pouvoir passer de: 
 \begin{center}
-$ u = (b_1 \,\&\&\, b_2) \,\&\&\, (b_3 \,\&\&\, b4)$ \hspace{1cm} à   \hspace{1cm}  $u' = b_1 \,\&\&\, (b_2 \,\&\&\, (b_3 \,\&\&\, b4)) $
+$ u := (b_1 \,\&\&\, b_2) \,\&\&\, (b_3 \,\&\&\, b4)$ \hspace{1cm} à   \hspace{1cm}  $u' := b_1 \,\&\&\, (b_2 \,\&\&\, (b_3 \,\&\&\, b4)) $
 \end{center}
 
 Pour cela, on a besoin de récupérer la structure du booléen $u$, c'est l'étape de réification. Il s'agit donc de construire, à partir de $u$, un terme du type $AndTree$ qui a la même structure que $u$.
@@ -275,9 +278,9 @@ Ltac reify A :=  match A with
 
 \end{lstlisting}
 
-Le terme $u = (b1\,\&\&\,b2)\,\&\&\,(b3\,\&\&\,b4)$ réifié donne bien 
+Le terme $u := (b1\,\&\&\,b2)\,\&\&\,(b3\,\&\&\,b4)$ réifié donne bien 
 \[And\,(And\,(Bool\,b1)\,(Bool\,b2))\,(And\,(Bool\,b3)\,(Bool\,b4))\] 
-et on notera que l'interprétation de ce nouveau terme est égale à $u$.
+et on notera que l'interprétation de ce nouveau terme est convertible à $u$.
 
 
 
@@ -328,7 +331,7 @@ et à chercher si la formule  $((a \wedge b) \vee c) \wedge d$ est satisfiable. 
 Ensuite, l'algorithme DPLL répète les étapes suivantes:
 \begin{itemize}
 \item Appeler un prouveur SAT sur la conjonction des formules (dans l'exemple on commence avec une seule formule). Si ce n'est pas satisfiable, alors l'algorithme répond que le problème n'est pas satisfiable.
-\item Sinon, le prouveur SAT donne une instanciation qui satisfait toutes les formules. Dans l'exemple, une telle instanciation pourrait être:
+\item Dans le cas contraire, le prouveur SAT donne une instanciation qui satisfait toutes les formules. La formule de l'exemple est satisfiable, une instanciation pourrait être:
   $a \, \wedge\,\neg b \, \wedge c\, \wedge \,d$,
 ce qui signifie que toutes les variables booléennes sont à $true$ sauf $b$ qui est à $false$.
 \item Vérifier que l'instanciation est valide dans les théories. Si c'est le cas, l'algorithme renvoie que le problème est satisfiable.
@@ -355,6 +358,9 @@ Pour savoir si le problème $lia5$ de la section précédente est satisfiable, o
 (exit)
 \end{lstlisting}
 
+On appelle assertion une formule contenue dans une ligne d'un fichier SMT-LIB commençant par $assert$: la formule $((x + y \leq -3 \wedge y \geq 0) \vee x \leq -3) \wedge x \geq 0$ est une assertion de $lia5.smt2$.
+
+
 \subsection{Format de sortie, les certificats de veriT} \label{sortie}
 
 Lorsqu'on appelle un prouveur automatique sur un fichier SMT-LIB, si la conjonction des assertions est satisfiable, le prouveur renvoie $sat$. Si la conjonction des assertions n'est pas satisfiable, le prouveur renvoie $unsat$ et fournit un fichier de certificat qui est un fichier qui explique pourquoi ce n'est pas satisfiable. Le format de ce fichier de certificat peut varier en fonction du prouveur SMT considéré. \\
@@ -368,7 +374,7 @@ où $id$ est un entier qui identifie la règle, $typ$ est le type de la règle, 
 
 \subsubsection{Règle $input$}
 
-Les règles de type $input$ sont des règles qui établissent les hypothèses du problème et correspondent à une ligne $assert$ dans le fichier SMT-LIB. Par exemple, la règle 
+Les règles de type $input$ sont des règles qui établissent les hypothèses du problème et correspondent à une assertion dans le fichier SMT-LIB. Par exemple, la règle 
 \[ 1:(input \,\, (x \geq 0)) \]
 est utilisée dans le cas où on suppose que $x$ est un entier positif. Cette règle (et les règles $input$ en général) ne dépend pas du résultat d'autres règles.\\
 
@@ -387,7 +393,7 @@ Une règle de résolution peut avoir plus de deux dépendances, son résultat es
 \subsubsection{Règles $not\_implies0$ et $not\_implies1$} \label{not_implies}
 La règle $not\_implies0$ implémente la règle logique qui donne $A$ à partir de $\neg (A \Rightarrow B)$ et $not\_implies1$ implémente la règle logique qui donne $\neg B$ à partir de $\neg (A \Rightarrow B)$. \\
 
-Ces règles dépendent donc du résultat d'une autre règle qui doit être une $clause$ de la forme $(\neg (X \Rightarrow Y))$. Les résultats des règles $not\_implies0$ et $not\_implies1$ sont alors respectivement $(X)$ et $(\neg Y)$. On peut alors montrer que la formule $\neg (A \Rightarrow A)$ n'est pas satisfiable:
+Ces règles dépendent donc du résultat d'une autre règle qui doit nécessairement être une clause de la forme $(\neg (X \Rightarrow Y))$. Les résultats des règles $not\_implies0$ et $not\_implies1$ sont alors respectivement $(X)$ et $(\neg Y)$. Cette règle nous permet de montrer que la formule $\neg (A \Rightarrow A)$ n'est pas satisfiable:
 \begin{align*}
   1&:(input\,\, (\neg ( A \Rightarrow A))) \\
   2&:(not\_implies0\,\, (A)\,\, 1) \\
@@ -396,7 +402,7 @@ Ces règles dépendent donc du résultat d'une autre règle qui doit être une $
 \end{align*}
 
 
-\section{Présentation de SMTCoq}
+\section{Présentation de SMTCoq} \label{pres_smtcoq}
 
 \subsection{SMTCoq, une interface sceptique entre Coq et les prouveurs automatiques}\label{sceptique_autarcique}
 
@@ -440,7 +446,7 @@ Dans la suite on s'attachera principalement à développer l'aspect automatisati
 \includegraphics[height=5cm]{Confiance.pdf}
 \end{center}
 
-Cette commande prend en paramètre un fichier 'fsmt' décrivant le lemme (typiquement écrit en SMT-LIB) et le certificat fourni par un prouveur automatique. Le lemme Coq est reconstruit à l'aide de l'interpréteur de SMTCoq et la preuve est reconstruite grâce au vérificateur. Une fois la reconstruction faite, la vérification que la preuve correspond bien au lemme est laissée à Coq. \\
+Cette commande prend en paramètre un fichier \textit{fsmt} décrivant le lemme (typiquement écrit en SMT-LIB) et le certificat fourni par un prouveur automatique. Le lemme Coq est reconstruit à l'aide de l'interpréteur de SMTCoq et la preuve est reconstruite grâce au vérificateur. Une fois la reconstruction faite, la vérification que la preuve correspond bien au lemme est laissée à Coq. \\
 
 Puisqu'un nouveau lemme Coq est créé, l'utilisateur peut vérifier que c'est bien le but qu'il voulait prouver. Ainsi, la confiance dans les prouveurs automatiques est améliorée: on peut vérifier la réponse du prouveur.
 
@@ -453,7 +459,7 @@ Dans les deux cas, les formules acceptées sont les formules logiques propositio
 
 \subsubsection{La tactique $verit$}
 
-La nouvelle tactique $verit$ définie par SMTCoq permet de résoudre automatiquement les buts dans les booléens en forme prénexe. On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}.
+La nouvelle tactique $verit$ définie par SMTCoq permet de résoudre automatiquement les buts dans les booléens en forme prénexe. On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}. En utilisant les fonctions booléennes de Coq, $negb$ pour la négation et $>=?$ et $<=?$ pour les inégalités larges, le problème $lia5$ devient :
 
 \begin{lstlisting}[frame=single]
 Lemma lia5 : 
@@ -464,7 +470,7 @@ Proof.
 Qed.
 \end{lstlisting}
 
-La tactique commence par introduire les variables quantifiées universellement en tête de formule (ici c'est $x$ et $y$) puis s'attend à ne pas avoir d'autres quantificateurs. C'est ensuite la négation de la formule qui est envoyée à veriT. La reconstruction de la preuve ne peut avoir lieu que si veriT renvoie $unsat$ ainsi qu'un fichier de certificat.
+La tactique $verit$ commence par introduire les variables quantifiées universellement en tête de formule (dans l'exemple ce sont $x$ et $y$) puis s'attend à ne pas avoir d'autres quantificateurs. C'est ensuite la négation de la formule qui est envoyée à veriT. La reconstruction de la preuve ne peut avoir lieu que si veriT renvoie $unsat$ ainsi qu'un fichier de certificat.
 
 \subsubsection{La commande de reconstruction}
 
@@ -521,18 +527,18 @@ Le vérificateur définit en Coq un type \textit{crule} qui représente les \tex
 \subsubsection{Le type inductif \textit{crule}}\label{regroupement}
 
 
-Chaque constructeur du type inductif \textit{crule} peut représenter alternativement l'une ou l'autre d'un ensemble de \textit{trule}. Le constructeur $Res$ ne représente que la règle $resolution$ mais d'autres constructeurs peuvent représenter différentes règles en fonction de leurs paramètres. Par exemple, le constructeur $ImmBuildProj$ regroupe les règles $not\_implies0$ et $not\_implies1$ et contient aussi un paramètre de type \textit{int} qui vaut $0$ ou $1$ et qui indique quelle est la \textit{trule} représentée. Ce regroupement permet d'unifier le fonctionnement de règles similaires et donc de simplifier le traitement de ces règles dans la suite du code. \\
+Chaque constructeur du type inductif \textit{crule} peut représenter alternativement l'une ou l'autre d'un ensemble de \textit{trule}. Le constructeur $Res$ ne représente que la règle $resolution$ mais d'autres constructeurs peuvent représenter différentes règles en fonction de leurs paramètres. Par exemple, le constructeur $ImmBuildProj$ regroupe les règles $not\_implies0$ et $not\_implies1$ (\ref{not_implies}) et contient aussi un paramètre de type \textit{int} qui vaut $0$ ou $1$ et qui indique quelle est la \textit{trule} représentée. Ce regroupement permet d'unifier le fonctionnement de règles similaires et donc de simplifier le traitement de ces règles dans la suite du code. \\
 
 On appellera \textit{ccertif} la liste de toutes les \textit{crule} du certificat.
 
 
 \subsubsection{La fonction récursive $checker$} \label{checker}
 
-Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état. On rappelle qu'une clause représente la disjonction d'une liste de formules. La fonction $checker$ implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisément, $checker$ est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui a aussi un paramètre état. À chaque appel de $checker$, une nouvelle \textit{crule} $cr$ est consommée, $checker$ met alors à jour l'état courant en fonction de $cr$.\\
+Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état. On rappelle qu'une clause représente la disjonction d'une liste de formules. La fonction $checker$ implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisément, $checker$ est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui a aussi un paramètre état. Le résultat des \textit{crule} suit le fonctionnement des $trule$. Par exemple le résultat de $ImmBuildProj \,\, 0 \,\, 1$ est $(X)$ si le premier emplacement du tableau d'état est de la forme $(\neg (X \Rightarrow Y))$. À chaque appel de $checker$, une nouvelle \textit{crule} est consommée, son résultat est utilisé pour modifier l'emplacement courant du tableau d'état.\\
 
-Il n'y a pas de \textit{crule} correspondant à la règle $input$. À la place, le tableau d'état est initialisé avec le résultat de la règle $input$. Ce fonctionnement n'est possible que lorsqu'il n'y a qu'un seul $input$, ce qui est le cas de la tactique $verit$ (la valeur d'initialisation est la négation du but). La taille du tableau est égale au nombre de règles du \textit{tcertif}. \\
+Il n'y a pas de \textit{crule} correspondant à la règle $input$. À la place, le tableau d'état est initialisé avec le résultat de la règle $input$. Ce fonctionnement n'est possible que lorsqu'il n'y a qu'une seule règle $input$, ce qui est le cas de la tactique $verit$ (la valeur d'initialisation est la négation du but). La taille du tableau est égale au nombre de règles du \textit{tcertif}. \\
 
-Lorsque toute la liste \textit{ccertif} a été consommée, $checker$ renvoie $true$ si la dernière case du tableau d'état contient la clause vide et $false$ sinon.
+Lorsque toute la liste \textit{ccertif} a été consommée, $checker$ renvoie $true$ si le dernier emplacement modifié du tableau d'état contient la clause vide et $false$ sinon.
 
 \subsubsection{Théorème de correction}
 
@@ -552,9 +558,12 @@ On dit qu'une clause est valide lorsque son interprétation est prouvable. La pr
 Considérons le but Coq suivant où $implb$ est l'implication booléenne:
 \begin{lstlisting}[frame=single]
   Lemma identity A : implb A A.
-\end{lstlisting}  
-Lorsqu'on applique $verit$, puisque c'est la négation du but qui est envoyée, le prouveur automatique nous renvoie le \textit{tcertif} de \ref{not_implies}. Celui-ci est traduit par SMTCoq en un \textit{ccertif} $cc$ et l'état est initialisé en un tableau $t$: 
-$cc = [ImmBuildProj \,\, 0 \,\, 1; \,ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 \,\, 3] $ et $t = [|nid; nid; nid; nid|]$ où $nid$ est la clause $( \neg (A \Rightarrow A))$.
+\end{lstlisting}
+
+L'emplacement courant, c'est-à-dire l'emplacement du tableau d'état à modifier lors d'un appel de $checker$, commence à 1 et augmente de 1 à chaque appel de checker. C'est encore le même fonctionnement que les certificats de veriT. \\
+
+Lorsqu'on applique $verit$, puisque c'est la négation du but qui est envoyée, le prouveur automatique nous renvoie le \textit{tcertif} de \ref{not_implies}. Celui-ci est traduit par SMTCoq en un \textit{ccertif} $cc$ et l'état est initialisé en un tableau $t$ avec  
+$cc := [ImmBuildProj \,\, 0 \,\, 1; \,ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 \,\, 3] $ et $t := [|nid; nid; nid; nid|]$ où $nid$ est la clause $( \neg (A \Rightarrow A))$.
 \begin{align*}
     checker \,\, cc \,\, t &\equiv checker \,\, [ImmBuildProj \,\, 0 \,\, 1; \,ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 \,\, 3] \,\, [| nid; nid; nid; nid|] \\
     &\equiv checker \,\, [ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 \,\, 3] \,\, [| nid; (A); nid; nid|] \\
@@ -562,7 +571,7 @@ $cc = [ImmBuildProj \,\, 0 \,\, 1; \,ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 \
     &\equiv checker \,\, [] \,\, [| nid; (A); (\neg A); ()|] \\
     &\equiv true
 \end{align*}
-En appliquant le théorème de correction, on obtient $\sim interp \,\, (\neg (A \Rightarrow A))$, soit $\sim \sim (implb\,\, A \,\,A)$. On a vu que (\ref{negation}), dans le cadre de SMTCoq, on peut alors obtenir $implb \,\, A \,\, A$.
+En appliquant le théorème de correction, on obtient $negb \,\,  (interp \,\, (\neg (A \Rightarrow A)))$ qui est convertible à $negb\,\, (negb\,\, (implb\,\, A \,\,A))$. On a vu que (\ref{negation}), dans le cadre de SMTCoq, on peut alors obtenir $implb \,\, A \,\, A$.
 
 \subsection{Le préprocesseur}
 
@@ -573,9 +582,9 @@ Les avantages d'une étape intermédiaire de compilation des certificats sont mu
  Les \textit{orule} sont des enregistrements constitués, en plus du code Ocaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ $prev$ et un champ $next$. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ $used$ de type \textit{int} qui est utilisé par la fonction $alloc$.
 
 
-\subsubsection{Allocation dans le tableau état} \label{alloc}
+\subsubsection{Allocation dans le tableau d'état} \label{alloc}
 
-On remarque que dans l'exemple précédent, le tableau d'état n'a pas besoin d'être aussi grand: 2 emplacements suffisent pour ce certificat. Pour réduire l'espace mémoire utilisé, il faut calculer le nombre maximum de clauses à retenir à chaque étape du $checker$, c'est ce que fait la fonction $alloc$. La taille du tableau d'état est fixée à cette valeur. Cette fonction assigne aussi une position dans un nouveau paramètre des \textit{orule}. Nous noterons ce paramètre de position au début, de sorte que lorsque $checker$ rencontre la \textit{crule} $ImmBuildProj \,\, 1\,\, 0 \,\, 2$, le premier emplacement de l'état est modifiée en $(X)$ si le deuxième emplacement de l'état contient $\neg(X \Rightarrow Y)$. Puisque les emplacements des clauses sont modifiés, il faut aussi modifier les dépendances des règles. Enfin, $checker$ prend un paramètre (ici ce paramètre est $1$) qui indique quelle est la position de la dernière règle, le résultat de la dernière règle n'étant pas nécessairement au dernier emplacement du tableau d'état.  
+On remarque que dans l'exemple précédent, le tableau d'état n'a pas besoin d'être aussi grand: 2 emplacements suffisent pour ce certificat. Pour réduire l'espace mémoire utilisé, il faut calculer le nombre maximum de clauses à retenir à chaque étape du $checker$, c'est ce que fait la fonction $alloc$. La taille du tableau d'état est fixée à cette valeur. Cette fonction assigne aussi une position dans un nouveau paramètre des \textit{orule} qui sert à déterminer l'emplacement courant. Nous noterons ce paramètre de position au début, de sorte que lorsque $checker$ rencontre la \textit{crule} $ImmBuildProj \,\, 1\,\, 0 \,\, 2$, le premier emplacement de l'état est modifié en $(X)$ si le deuxième emplacement de l'état contient $\neg(X \Rightarrow Y)$. Puisque les emplacements des clauses sont modifiés, il faut aussi modifier les dépendances des règles. Enfin, $checker$ prend un paramètre (dans l'exemple ce paramètre est $1$) qui indique quelle est la position de la dernière règle, le résultat de la dernière règle n'étant pas nécessairement au dernier emplacement du tableau d'état comme précédemment.
 \begin{align*}
     checker \,\, cc \,\, t \,\, 1 &\equiv checker \,\, [ImmBuildProj \,\, 1\,\, 0 \,\, 2; \,ImmBuildProj \,\, 2\,\, 1 \,\, 2; \, Res \,\, 1 \,\, 1 \,\, 2] \,\, [| nid; nid|] \,\, 1 \\
     &\equiv checker \,\, [ImmBuildProj \,\, 2 \,\, 1 \,\, 2; \, Res \,\, 1 \,\, 1 \,\, 2] \,\, [| (A); nid|] \,\, 1 \\
@@ -612,7 +621,7 @@ On remarquera que la règle $forall\_inst$ ne dépend d'aucune autre règle et q
 
 \subsubsection{Lien entre une règle $forall\_inst$ et une règle $input$} 
 
-Dans l'exemple, la dépendance de la règle $forall\_inst$ au lemme donné dans la règle $input$ est évidente pour plusieurs raisons: le certificat est de petite taille, il y a égalité syntaxique entre le lemme et une sous-formule du résultat de la règle $forall\_inst$, la règle de résolution qui utilise la règle $forall\_inst$ est située juste juste après celle-ci et a exactement 2 dépendances. Cependant, dans le cas général, aucune de ces raisons ne reste valide. En particulier, veriT fait un renommage des variables liées qui apparaissent dans les lemmes (l'exemple complet est présenté dans l'annexe B). Retrouver la dépendance demande donc, a priori, d'unifier à $\alpha$-équivalence près des formules contenues dans une règle $forall\_inst$ et dans les règles $input$. Heureusement, veriT fait un \textit{hash-consing} des formules qui apparaissent dans les \textit{tcertif}. Cela nous permet d'enregistrer la dépendance au lemme dans la règle $forall\_inst$ au moment du \textit{parsing} des certificats de veriT. La règle $2$ devient: 
+Dans l'exemple, la dépendance de la règle $forall\_inst$ au lemme donné dans la règle $input$ est évidente pour plusieurs raisons: le certificat est de petite taille, il y a égalité syntaxique entre le lemme et une sous-formule du résultat de la règle $forall\_inst$, la règle de résolution qui utilise la règle $forall\_inst$ est située juste juste après celle-ci et a exactement 2 dépendances. Cependant, dans le cas général, aucune de ces raisons ne reste valide. En particulier, veriT fait un renommage des variables liées qui apparaissent dans les lemmes (le certificat complet est donnée dans l'annexe B). Retrouver la dépendance demande donc, a priori, d'unifier à $\alpha$-équivalence près des formules contenues dans une règle $forall\_inst$ et dans les règles $input$. Heureusement, veriT fait un \textit{hash-consing} des formules qui apparaissent dans les \textit{tcertif}. Cela nous permet d'enregistrer la dépendance au lemme dans la règle $forall\_inst$ au moment du \textit{parsing} des certificats de veriT. La règle $2$ devient: 
 \begin{align*}
 2:(forall\_inst \,\, (\neg(\forall \,\,x, \,\,f \,\,(x+1) = f\,\,x+7) \,\,(f\,\, (2+1) = f\,\,2+7)) \,\,1) 
 \end{align*}
@@ -621,7 +630,7 @@ Dans l'exemple, la dépendance de la règle $forall\_inst$ au lemme donné dans 
 
 On cherche à établir un lien entre une formule et un lemme rajouté par l'utilisateur de SMTCoq. La difficulté vient du fait que les lemmes additionnels peuvent apparaître modifiés dans les certificats de veriT. Rétablir la forme initiale est une solution trop coûteuse car il faudrait modifier la structure de toutes les formules suivantes qui en dépendent, directement ou indirectement. Pour résoudre ce problème, on utilise deux tables de hachage distinctes: $tbl$ et $tbl'$. \\
 
-La table $tbl$ sert, comme précédemment, pour le \textit{hash-consing} des formules. On a vu que ces formules sont ensuite interprétées pour construire le terme de preuve, il faut donc qu'elle soient traduites fidèlement. D'autre part, les variables qui apparaissent dans les lemmes et qui sont liés par leurs quantificateurs sont à traiter séparément des autres variables. En effet, elles sont quantifiées universellement alors que les autres variables sont implicitement quantifiées existenciellement (c'est un problème de satisfiabilité). Par ailleurs ces variables n'ont pas de sens en dehors du lemme dans lequel elles sont quantifiées. Puisque ces variables ne sont pas utilisées par la suite, il serait inutile d'enregistrer un terme qui contient une de ces variables.
+La table $tbl$ sert, comme précédemment, pour le \textit{hash-consing} des formules. On a vu que ces formules sont ensuite interprétées pour construire le terme de preuve, il faut donc que celles-ci soient traduites fidèlement. D'autre part, les variables qui apparaissent dans les lemmes et qui sont liées par leurs quantificateurs sont à traiter séparément des autres variables. En effet, elles sont quantifiées universellement alors que les autres variables sont implicitement quantifiées existenciellement (c'est un problème de satisfiabilité). Par ailleurs ces variables n'ont pas de sens en dehors du lemme dans lequel elles sont quantifiées. Puisque ces variables ne sont pas utilisées par la suite, il serait inutile d'enregistrer un terme qui contient une de ces variables.
 Pour résoudre ce problème, au moment du \textit{parsing}, on maintient, en plus de la formule qui est en train d'être traitée, une valeur booléenne qui indique si cette formule contient une variable quantifiée universellement. Lorsque ce booléen est à $true$, on n'enregistre pas la sous-formule. Par exemple dans la formule $\forall x, (f \,\, (x+1) = f \,\, x \wedge f\,\,0 = 0)$ la sous-formule $f \,\, 0 = 0$ est enregistrée dans la table $tbl$ mais ni $f\,\,(x+1) = f\,\,x$ ni $f \,\, (x+1) = f \,\, x \wedge f\,\,0 = 0$ le sont.\\
 
 La table $tbl'$ nous sert pour reconnaître des formule aux modifications de veriT près. Par exemple, une égalité  peut apparaître inversée  dans la règle $input$ d'un lemme additionnel. À chaque fois qu'il faut enregistrer une nouvelle sous-formule de la forme $a = b$, en plus de vérifier si cette formule est déjà contenue dans la table $tbl'$, on regarde aussi si la formule $b = a$ est dans cette même table. Ainsi, on peut reconnaître des formules modulo symétrie de l'égalité efficacement.
@@ -663,18 +672,18 @@ Il faut aussi modifier les règles suivantes qui dépendent du résultat de cett
 
 \section{Vérificateur pour les lemmes quantifiés} \label{instanciations}
 
-Pour traiter le cas des lemmes rajoutés au contexte par l'utilisateur, on a besoin de rajouter un constructeur au type \textit{crule}. On verra comment modifier le vérificateur en conséquence afin de rétablir la preuve de correction et de préserver l'automatisation de SMTCoq.
+Pour traiter le cas des lemmes quantifiés du point de vue de Coq, on a besoin de rajouter un constructeur au type inductif \textit{crule}. On verra comment modifier le vérificateur en conséquence afin de rétablir la preuve de correction et de préserver l'automatisation de SMTCoq.
 
 
 \subsection{La \textit{crule} $Forallinst$}
 
 Rajouter un constructeur au type \textit{crule} demande de compléter la preuve de  $step\_checker\_correct$ correspondant à cette nouvelle règle (\ref{preuve_correction}). Le reste de la preuve de correction ne dépendant pas des \textit{crule} autrement que par ce lemme, c'est la seule modification à apporter à la preuve quand on ajoute une nouvelle règle. C'est un autre aspect de la modularité de SMTCoq. \\
 
-Le nouveau constructeur s'écrit $Forallinst\,\, p\,\, lemma\,\, plemma \,\,lemma\_inst \,\,pinstanc$ où $p$ est le paramètre de position (\ref{alloc}), $lemma$ est le lemme dont on a identifié la dépendance (\ref{lien}), $plemma$ est la preuve de ce lemme, $lemma\_inst$ est l'instanciation et $pinstanc$ est un élément du type $lemma \rightarrow lemma\_inst$. \\
+Le nouveau constructeur s'écrit $Forallinst\,\, p\,\, lemma\,\, plemma \,\,lemma\_inst \,\,pinstanc$ où $p$ est le paramètre de position (\ref{alloc}), $lemma$ est le lemme dont on a identifié la dépendance (\ref{lien}), $plemma$ est la preuve de ce lemme, $lemma\_inst$ est l'instance et $pinstanc$ est un élément du type $lemma \rightarrow interp \,\, lemma\_inst$, c'est-à-dire une preuve que le lemme implique l'instance. \\
 
 Une étape de la fonction $checker$ correspondant à une telle \textit{crule} modifie la clause $p$ de l'état en la clause $lemma\_inst$. On peut facilement prouver que $lemma\_inst$ est valide, et même indépendemment des clauses contenues par l'état. En effet, il suffit d'appliquer $pinstanc$ à $plemma$. On a donc rétabli la preuve du théorème de correction.\\
 
-Le problème est en fait déplacé puisqu'il faut maintenant, pour construire une \textit{crule}, donner une preuve d'instanciation, c'est-à-dire une preuve le lemme implique l'instance. Cette preuve est donnée à l'aide d'un ``cut'' (tactique $assert$ en Coq), ce qui nous permet de donner les preuves d'instanciation dans un deuxième temps.
+Le problème est en fait déplacé puisqu'il faut maintenant, pour construire une \textit{crule}, donner un élément du type $lemma \rightarrow interp \,\, lemma\_inst$ qu'on appellera preuve d'instanciation. Cette preuve est donnée à l'aide d'une coupure (tactique $assert$ en Coq), ce qui nous permet de donner les preuves d'instanciation dans un deuxième temps.
 
 \subsection{Preuves d'instanciation}
 
@@ -682,7 +691,7 @@ La structure d'une instance peut différer de celle du lemme pour plusieurs rais
 
 \subsubsection{Preuve automatique d'une instanciation} \label{preuve_auto}
 
-Le lemme Coq suivant correspond directement à l'instanciation du lemme donnée :
+Le lemme Coq suivant correspond directement à l'instanciation du lemme donné:
 \begin{lstlisting}[frame=single]
 Lemma instance_c P (c : Z): 
   (forall x, P x) ->
@@ -700,11 +709,11 @@ Il faut donc remettre le but dans une forme qui correspond à celle du lemme. Da
 
 \subsubsection{Différence liée à la symétrie de l'égalité}
 
-Les lemmes qui apparaissent dans les certificats de veriT peuvent avoir subi des modifications (\ref{lien_formule_lemme}), ces modifications se retrouvent dans les règles d'instanciation des lemmes. Par exemple, à partir du lemme Coq $forall\,\, x, \,\,f \,\,x =? \, f \,\,c$ où $c$ est une constante entière, le certificat de veriT peut contenir la règle:
+Les lemmes qui apparaissent dans les certificats de veriT peuvent avoir subi des modifications (\ref{lien_formule_lemme}), ces modifications se retrouvent dans les règles d'instanciation des lemmes. À partir du lemme Coq $forall\,\, x, \,\,f \,\,x =? \, f \,\,c$ où $c$ est une constante entière, le certificat de veriT peut contenir la règle:
 \[id1: (input \,\,(\forall\,\, x, \,\,f \,\,c = f \,\,x))\]
 Une règle instance correspondant à ce lemme peut donc être: 
 \[id2:(forall\_inst\,\, (\neg (\forall \,\,x,\,\, f\,\, c = f \,\,x) \,\, (f\,\, c = f\,\, 3)))\]
-On a vu qu'on pourra reconnaître que cette instance correspond au lemme donné par l'utilisateur. On est donc ramené au problème $instance\_3$ (\ref{preuve_auto}). Pour résoudre ce problème, on commence par remarquer que la plupart du temps, si une des égalités est inversée, alors toutes les égalités sont inversées. On écrit une tactique qui inverse toutes les égalités et pour chaque cas on essaye de résoudre le but en utilisant cette tactique et en ne l'utilisant pas.
+On a vu qu'on peut reconnaître que cette instance correspond au lemme donné par l'utilisateur (\ref{lien}). On est donc ramené au problème $instance\_3$. Pour résoudre ce problème, on commence par remarquer que la plupart du temps, si une des égalités est inversée, alors toutes les égalités sont inversées. On écrit une tactique qui inverse toutes les égalités et pour chaque cas on essaye de résoudre le but en utilisant cette tactique et en ne l'utilisant pas.
 
 \subsubsection{Différence $impl\_split$}
 
@@ -742,18 +751,9 @@ Cette tactique laisse à l'utilisateur les 2 preuves d'instanciation. On peut te
 Proof. intro f_k_linear. verit_base f_k_linear. vauto. vauto. Qed
 \end{lstlisting}
 
-Plus généralement, lorsqu'on veut rajouter les lemmes $H_1, \,\,...,\,\, H_n$, on utilisera : \[verit\_base\,\, H_1 \,\,...\,\, H_n; \,\,vauto.\]
+Plus généralement, lorsqu'on veut rajouter les lemmes prouvés par $H_1, \,\,...,\,\, H_n$, on utilisera : \[verit\_base\,\, H_1 \,\,...\,\, H_n; \,\,vauto.\]
 
-On définit la tactique 
-\[verit\] 
-comme $verit\_base; \,\,vauto$ ce qui nous permet de conserver le comportement de cette tactique par rapport à la version antérieure de SMTCoq lorsque l'on n'utilise pas de lemmes supplémentaires. \\
-
-On définit également une liste de lemmes qui sera toujours ajoutée à $verit\_base$. Initialement cette liste est vide mais la commande 
-\[Add\_lemmas \,\,H_1 \,\,... \,\,H_n.\] la concatène avec les lemmes $H_1$ ,\,\,... ,\,\,$H_n$. Pour finir la commande 
-\[Clear\_lemmas\]
-réinitialise la base de lemmes.\\
-
-D'autres exemples sont donnés dans les fichiers \textit{examples/Example.v} et \textit{unit-tests/Tests\_verit.v} du dépôt Git \textit{https://github.com/smtcoq/smtcoq}.
+On définit la tactique $verit$ comme $verit\_base; \,\,vauto$ ce qui nous permet de conserver le comportement de cette tactique par rapport à la version antérieure de SMTCoq lorsque l'on n'utilise pas de lemmes supplémentaires. On définit également une liste qui sera toujours ajoutée à $verit\_base$. Initialement cette liste est vide mais la commande $Add\_lemmas \,\,H_1 \,\,... \,\,H_n$ la concatène avec $H_1$ ,\,\,... ,\,\,$H_n$. Pour finir la commande $Clear\_lemmas$ réinitialise la liste. D'autres exemples sont donnés dans les fichiers \textit{examples/Example.v} et \textit{unit-tests/Tests\_verit.v} du dépôt Git: \[https://github.com/smtcoq/smtcoq\]
 
 
 \section{Travaux connexes et conclusion}
@@ -761,7 +761,7 @@ D'autres exemples sont donnés dans les fichiers \textit{examples/Example.v} et 
 Ce stage s'inscrit dans une approche automatique de la démonstration dans un assistant de preuve et porte plus précisément sur SMTCoq. D'autres outils sont disponibles dans ce cadre, à commencer par Coqhammer \cite{coqhammer} qui est aussi un \textit{plugin} pour Coq qui utilise des prouveurs automatiques. À la différence de SMTCoq, lors de la reconstruction de la preuve, Coqhammer liste les lemmes qui apparaissent dans le certificat et n'utilise rien d'autre que cette liste du certificat. Ainsi, il y a une recherche qui est faite par des tactiques en Coq et qui permet de retrouver la preuve. Cette méthode est plus robuste que celle  de SMTCoq vis-à-vis des prouveurs automatiques mais demande de chercher à nouveau la preuve et est donc plus coûteuse. De la même manière, pour retrouver les instanciations des lemmes (partie \ref{instanciations}), la recherche a été faite en Coq. Cette méthode s'est avérée utile pour passer outre certaines différences entre instances et lemmes. Un autre point de divergence est que SMTCoq propose aussi une commande de vérification ce qui permet d'améliorer la confiance accordée aux prouveurs automatiques (\ref{confiance}).\\
 On peut aussi mentionner Sledgehammer \cite{sledgehammer_manual} qui est un outil développé pour l'assistant de preuve Isabelle afin d'y intégrer une interface sceptique avec des prouveurs automatiques. Sledgehammer a mis en place un sélectionneur de lemmes qui apprend quels lemmes il est judicieux d'envoyer aux prouveurs automatiques \cite{hol_selector}.\\
 
-En résumé, ce stage a permis d'améliorer l'expressivité de SMTCoq tout en restant dans un cadre qui assure la correction de la méthode. Cette amélioration de l'expressivité a été confirmée par de nouveaux tests. Enfin, ce stage ouvre de nouvelles pistes de travail (\ref{persp}): améliorer l'efficacité, étendre les cas d'application, utiliser SMTCoq pour la certification Why3, etc.
+En résumé, ce stage a permis d'améliorer l'expressivité de SMTCoq tout en restant dans un cadre qui assure la correction de la méthode. Cette amélioration de l'expressivité a été confirmée par de nouveaux tests. Enfin, ce stage ouvre de nouvelles pistes de travail (\ref{persp}), on peut améliorer l'efficacité, étendre les cas d'application ou encore utiliser SMTCoq pour la certification Why3.
 
 
 
@@ -915,7 +915,7 @@ Qed.
 \lstset{language=Java}
 
 Lorsqu'on appelle veriT sur le fichier SMT-LIB $simple\_instance.smt2$ suivant: 
-\begin{lstlisting}[frame=single]
+\begin{lstlisting}[frame=no]
 (set-logic UFLIA)
 (declare-fun f (Int) Int)
 (assert (not (= (f 3) (+ (f 2) 7))))
@@ -926,7 +926,7 @@ Lorsqu'on appelle veriT sur le fichier SMT-LIB $simple\_instance.smt2$ suivant:
 
 on obtient $unsat$ et la preuve dans un fichier contenant: 
 
-\begin{lstlisting}[frame=single]
+\begin{lstlisting}[frame=no]
 1:(input ((not #1:(= #2:(f 3) #3:(+ #4:(f 2) 7)))))
 2:(input (#5:(forall ( (x Int) ) #6:(= #7:(f #8:(+ x 1)) #9:(+ #10:(f x) 7)))))
 3:(tmp_betared (#11:(forall ( (@vr0 Int) ) #12:(= #13:(f #14:(+ @vr0 1)) #15:(+ #16:(f @vr0) 7)))) 2)
