@@ -118,11 +118,11 @@ D'autre part, ma contribution respecte le principe sceptique de SMTCoq (\ref{sce
 
 \subsection{Bilan et perspectives}\label{persp}
 
-Un des buts que l'on souhaite poursuivre est de certifier le logiciel de vérification Why3 \cite{why3_intro}. Puisque Why3 utilise des prouveurs automatiques, il faut alors pouvoir certifier les démonstrations faites par ces prouveurs. Ce sujet est lié à celui de ma thèse intitulée "Certification de la génération et la transformation d'obligations de preuves" et encadrée par Claude Marché, Chantal Keller et Andrei Paskevich. À cette occasion, j'utiliserai SMTCoq et je profiterai de l'amélioration de son expressivité due à mon stage. Je pourrai l'améliorer encore en étendant le format des lemmes que l'on peut transmettre à SMTCoq.
+Les formules acceptées par SMTCoq doivent porter sur les termes concrets du type des booléens et doivent aussi être en forme prénexe. On pourrait améliorer l'expressivité en étendant les cas d'application (\ref{cas_application}) aux termes du type des propositions en Coq.
 
-L'expressivité peut également être améliorée en considérant les termes concrets du type des propositions dans Coq en plus de ceux du type des booléens.
+On pourrait aussi utiliser des méthodes de \textit{machine learning} pour sélectionner les lemmes à envoyer au prouveur automatique comme c'est fait dans Coqhammer et Sledgehammer \cite{hol_selector, coqhammer}. L'avantage étant qu'avec des lemmes pertinents et en petit nombre le prouveur automatique trouve plus rapidement et plus souvent la preuve du théorème en question.
 
-On pourrait aussi utiliser des méthodes de \textit{machine learning} pour sélectionner les lemmes à envoyer au prouveur automatique comme c'est fait dans Coqhammer et Sledgehammer \cite{hol_selector, coqhammer}. L'avantage étant qu'avec des lemmes pertinents et en petit nombre le prouveur automatique trouve plus rapidement et plus souvent la preuve du théorème en question.\medbreak
+Un autre but que l'on souhaite poursuivre est de certifier le logiciel de vérification Why3 \cite{why3_intro}. Puisque Why3 utilise des prouveurs automatiques, il faut alors pouvoir certifier les démonstrations faites par ces prouveurs. Ce sujet est lié à celui de ma thèse intitulée "Certification de la génération et la transformation d'obligations de preuves" et encadrée par Claude Marché, Chantal Keller et Andrei Paskevich. À cette occasion, j'utiliserai SMTCoq et je profiterai de l'amélioration de son expressivité due à mon stage. Je pourrai l'améliorer encore en étendant le format des lemmes que l'on peut transmettre à SMTCoq. \medbreak
 
 Ces améliorations de l'expressivité et de l'efficacité combinées avec la facilité d'utilisation et la robustesse de SMTCoq ont pour objectifs d'en faire un outil accessible et de généraliser son utilisation dans les projets développés en Coq.
 
@@ -158,7 +158,7 @@ Les fragments de code Coq fournis sont encadrés et sont compilables lorsqu'ils 
 \end{lstlisting}
 Cela requiert l'installation de SMTCoq, disponible à l'adresse
 \begin{align*}
-    \text{https://github.com/smtcoq/smtcoq}
+    \texttt{https://github.com/smtcoq/smtcoq}
 \end{align*}
 On préférera la version utilisant native-coq \cite{native-coq}.
 
@@ -176,7 +176,7 @@ Pour définir de nouveaux termes en Coq, on peut utiliser un type inductif ou un
 
 \subsubsection{Types inductifs}
 
-Prenons l'exemple des formules conjonctives booléennes. Ces formules sont des éléments du type inductif $AndTree$ qui a un constructeur $Bool$ pour les feuilles et un constructeur $And$ pour les nœuds: 
+Prenons l'exemple des formules conjonctives booléennes. Ces formules sont des éléments du type inductif \texttt{AndTree} qui a un constructeur \texttt{Bool} pour les feuilles et un constructeur \texttt{And} pour les nœuds: 
 
 \begin{lstlisting}[frame=single]
 Inductive  AndTree := 
@@ -195,7 +195,7 @@ Inductive Interp : AndTree -> bool -> Prop :=
     Interp (And t1 t2) b3.
 \end{lstlisting}
 
-$Interp \, t \, b$ signifie que l'arbre $t$ s'interprète en un booléen $b$. Cette définition suit la définition des formules conjonctives. En effet, il y a bien deux cas, $InterpBool$ pour les feuilles de l'arbre et $InterpAnd$ pour les nœuds. Le cas $InterpAnd$ s'explique ainsi: si $t1$ s'interprète en $b1$ et $t2$ s'interprète en $b2$ alors $And \, t1 \, t2$ s'interprète en $b1\,\&\&\,b2$.  On a utilisé la fonction Coq $andb$ notée $\&\&$ qui implémente la conjonction booléenne.
+\texttt{Interp t b} signifie que l'arbre \texttt{t} s'interprète en un booléen \texttt{b}. Cette définition suit la définition des formules conjonctives. En effet, il y a bien deux cas, \texttt{InterpBool} pour les feuilles de l'arbre et \texttt{InterpAnd} pour les nœuds. Le cas \texttt{InterpAnd} s'explique ainsi: si \texttt{t1} s'interprète en \texttt{b1} et si \texttt{t2} s'interprète en \texttt{b2} alors \texttt{And t1 t2} s'interprète en \texttt{b1 \&\& b2}. On a noté \texttt{\&\&} la fonction Coq \texttt{andb} qui implémente la conjonction booléenne.
 
 On peut alors faire des preuves sur les éléments de ce type inductif: 
 \begin{lstlisting}[frame=single]
@@ -214,7 +214,7 @@ Qed.
 
 La réflexion calculatoire repose sur la convertibilité de deux termes: deux termes sont convertibles lorsqu'ils se réduisent vers un même terme. Aussi, à chaque nouvelle définition, la nouvelle constante qui est définie est convertible à sa définition. \medbreak
 
-Plutôt que d'utiliser un prédicat qui prend une formule conjonctive $t$ et un booléen $b$, et qui énonce que $t$ s'interprète en $b$, on peut définir une fonction récursive qui calcule l'interprétation et combiner cette fonction avec le prédicat de l'égalité. On peut ensuite montrer que les deux formalisations sont bien équivalentes.  
+Plutôt que d'utiliser un prédicat qui prend une formule conjonctive \texttt{t} et un booléen \texttt{b}, et qui énonce que \texttt{t} s'interprète en \texttt{b}, on peut définir une fonction récursive qui calcule l'interprétation et combiner cette fonction avec le prédicat de l'égalité. On peut ensuite montrer que les deux formalisations sont bien équivalentes.  
 
 \begin{lstlisting}[frame=single]
 Fixpoint interp (t : AndTree) :=
@@ -228,7 +228,7 @@ Proposition Interp_eq_interp t b :
 \end{lstlisting}
 
 
-L'avantage de cette définition de l'interprétation par rapport au type inductif est que, grâce à la convertibilité de $interp$ à sa définition, on a une preuve triviale du lemme précédent.
+L'avantage de cette définition de l'interprétation par rapport au type inductif est que, grâce à la convertibilité de \texttt{interp} à sa définition, on a une preuve triviale du lemme précédent.
 
 \begin{lstlisting}[frame=single]
 Lemma interp_t_false : interp t = false.
@@ -237,15 +237,15 @@ Proof.
 Qed.
 \end{lstlisting}
 
-En effet, en notant $a \equiv b$ lorsque $a$ est convertible à $b$, on a:
+En effet, en notant \texttt{a} $\equiv$ \texttt{b} lorsque \texttt{a} est convertible à \texttt{b}, on a:
 \begin{align*}
-  interp \,\,t \equiv \,\, &interp\,\, (And \,\,(Bool \,\,true) \,\,(Bool \,\,false)) \,\,\&\& \,\, \\
-  \,\, &interp\,\, (And \,\,(Bool\,\, true) \,\,(Bool\,\, true)) \\
-  \equiv \,\, &(interp \,\,(Bool \,\,true) \,\,\&\&\,\, interp \,\,(Bool \,\,false)) \,\,\&\&\,\, \\
-  &(interp\,\, (Bool \,\,true) \,\,\&\&\,\, interp \,\,(Bool\,\, true)) \\
-  \equiv \,\, &(true \,\,\&\&\,\, false) \,\,\&\&\,\, (true \,\,\&\&\,\, true) \\
-  \equiv\,\, &false \,\,\&\&\,\, (true \,\,\&\&\,\, true) \\
-  \equiv\,\, &false
+  \texttt{interp t} \equiv \,\, &\texttt{interp (And (Bool true) (Bool false)) \&\&}  \\
+  \,\, &\texttt{interp (And (Bool true) (Bool true))} \\
+  \equiv \,\, &\texttt{(interp (Bool true) \&\& interp (Bool false)) \&\&} \\
+  \,\,&\texttt{(interp (Bool true) \&\& interp (Bool true))} \\
+  \equiv \,\, &\texttt{(true \&\& false) \&\& (true \&\& true)} \\
+  \equiv\,\, &\texttt{false \&\& (true \&\& true)} \\
+  \equiv\,\, &\texttt{false}
 \end{align*}  
 
 Ce fonctionnement peut être exploité pour construire des preuves qui reposent sur un calcul de convertibilité de termes Coq.
@@ -257,19 +257,19 @@ Ce fonctionnement peut être exploité pour construire des preuves qui reposent 
 
 La réification est le fait de passer d'un \textit{shallow-embedding} à un \textit{deep-embedding}. Dans le cas du \textit{deep-embedding}, un terme est représenté dans un nouvel AST ce qui met en évidence sa structure. À l'inverse, un \textit{shallow-embedding} du même terme est traduit directement vers sa valeur dans le langage cible. \medbreak
 
-Reprenons l'exemple des formules conjonctives et considérons la formule $ u := (b_1 \wedge b_2) \wedge (b_3 \wedge b4)$. À l'instar de la section précédente, le \textit{deep-embedding} de $u$ est donné dans le type $AndTree$:
-\[And\,(And\,(Bool\,b1)\,(Bool\,b2))\,(And\,(Bool\,b3)\,(Bool\,b4))\] 
+Reprenons l'exemple des formules conjonctives et considérons la formule $ u := (b_1 \wedge b_2) \wedge (b_3 \wedge b4)$. À l'instar de la section précédente, le \textit{deep-embedding} de $u$ est donné dans le type \texttt{AndTree}:
+\[\texttt{And (And (Bool b1) (Bool b2)) (And (Bool b3) (Bool b4))}\] 
 et son \textit{shallow-embedding} peut être donné en utilisant la conjonction booléenne de Coq: 
-\[(b1\,\&\&\,b2)\,\&\&\,(b3\,\&\&\,b4) \]
-Dans la suite, on s'intéresse au problème de mettre des formules booléennes conjonctives en forme de peigne. Avec $b_1, b_2, b_3, b_4$ des termes de type $bool$, on veut, par exemple, pouvoir passer de: 
+\[\texttt{(b1 \&\& b2) \&\& (b3 \&\& b4)} \]
+Dans la suite, on s'intéresse au problème de mettre des formules booléennes conjonctives en forme de peigne. Avec \texttt{b1}, \texttt{b2}, \texttt{b3} et \texttt{b4} des termes Coq de type \texttt{bool}, on veut, par exemple, pouvoir passer de: 
 \begin{center}
-$ u := (b_1 \,\&\&\, b_2) \,\&\&\, (b_3 \,\&\&\, b4)$ \hspace{1cm} à   \hspace{1cm}  $u' := b_1 \,\&\&\, (b_2 \,\&\&\, (b_3 \,\&\&\, b4)) $
+\texttt{ v := (b1 \&\& b2) \&\& (b3 \&\& b4)}  \hspace{.5cm} à   \hspace{.5cm}  \texttt{v' := b1 \&\& (b2 \&\& (b3 \&\& b4))}
 \end{center}
-Pour cela, on a besoin de récupérer la structure du booléen $u$, c'est l'étape de réification. Il s'agit donc de construire, à partir de $u$, un terme du type $AndTree$ qui a la même structure que $u$.
+Pour cela, on a besoin de récupérer la structure du booléen \texttt{v}, c'est l'étape de réification. Il s'agit donc de construire, à partir de \texttt{v}, un terme du type \texttt{AndTree} qui a la même structure que \texttt{v}.
 
 \subsubsection{Méthodes}
 
-Il n'est pas possible d'écrire en Coq une fonction qui détermine la forme conjonctive d'un argument booléen. En effet, le type $bool$ n'ayant que deux constructeurs ($true$ et $false$), inspecter par \textit{pattern-matching} nous donnera un de ces deux constructeurs.\medbreak
+Il n'est pas possible d'écrire en Coq une fonction qui détermine la forme conjonctive d'un argument booléen. En effet, le type \texttt{bool} n'ayant que deux constructeurs (\texttt{true} et \texttt{false}), inspecter par \textit{pattern-matching} nous donnera un de ces deux constructeurs.\medbreak
 
 Une solution est d'étudier la structure du terme en question à partir de sa représentation OCaml sous-jacente. C'est l'approche utilisée par SMTCoq. \medbreak
 
@@ -282,9 +282,9 @@ Ltac reify A :=  match A with
   | ?X => constr:(Bool X) end.
 
 \end{lstlisting}
-Le terme $u := (b1\,\&\&\,b2)\,\&\&\,(b3\,\&\&\,b4)$ réifié donne bien 
-\[And\,(And\,(Bool\,b1)\,(Bool\,b2))\,(And\,(Bool\,b3)\,(Bool\,b4))\] 
-et on notera que l'interprétation de ce nouveau terme est convertible à $u$.
+Le terme \texttt{u := (b1 \&\& b2) \&\& (b3 \&\& b4)} réifié donne bien 
+\[\texttt{And (And (Bool b1) (Bool b2)) (And (Bool b3) (Bool b4))}\] 
+et on notera que l'interprétation de ce nouveau terme est convertible à \texttt{u}.
 
 
 
@@ -293,11 +293,11 @@ et on notera que l'interprétation de ce nouveau terme est convertible à $u$.
 
 L'intérêt de la réification est que la structure du terme réifié est mise en évidence. Il devient alors possible de manipuler explicitement cette structure. \medbreak
 
-Par exemple, sur le type $AndTree$, il est possible de définir une fonction $peigne$ qui renvoie l'arbre en argument mis sous forme de peigne. Le théorème de correction de cette fonction établit que
-\[ \forall t \in AndTree, \, interp \,\, (peigne \,\, t) = interp \,\, t \]
-Ce théorème de correction n'est applicable que si on a un terme de la forme $interp \,\, x$, forme que l'on peut obtenir en s'assurant que pour tout terme booléen $b$, l'interprétation de la réification de $b$ est convertible à $b$.\medbreak
+Par exemple, sur le type \texttt{AndTree}, il est possible de définir une fonction \texttt{peigne} qui renvoie l'arbre en argument mis sous forme de peigne. Le théorème de correction de cette fonction établit que
+\[ \texttt{forall t\,:\,AndTree, interp (peigne t) = interp t} \]
+Ce théorème de correction n'est applicable que si on a un terme de la forme \texttt{interp x}, forme que l'on peut obtenir en s'assurant que pour tout terme booléen \texttt{b}, l'interprétation de la réification de \texttt{b} est convertible à \texttt{b}.\medbreak
 
-En combinant tous ces résultats, on peut définir une tactique $peignify$ qui met les formules conjonctives en forme de peigne. Cette tactique permet par exemple de démontrer le lemme suivant: 
+En combinant tous ces résultats, on peut définir une tactique \texttt{peignify} qui met les formules conjonctives en forme de peigne. Cette tactique permet par exemple de démontrer le lemme suivant: 
 \begin{lstlisting}[frame=single]
 Lemma peigne4 b1 b2 b3 b4:
   (b1 && b2) && (b3 && b4) = b1 && ((b2 && b3) && b4).
@@ -305,7 +305,7 @@ Proof.
   peignify. reflexivity.
 Qed.
 \end{lstlisting}
-Cette preuve a un contenu calculatoire: le calcul de la fonction $peigne$ sur la réification du terme $u$ de type $bool$. Pour le code complet de cette partie et en particulier le code de la tactique $peignify$, voir l'annexe A, la preuve de correction est inspirée de \cite{coq_intro}, section 3.3.
+Cette preuve a un contenu calculatoire: le calcul de la fonction \texttt{peigne} sur la réification du terme \texttt{u} de type \texttt{bool}. Pour le code complet de cette partie et en particulier le code de la tactique \texttt{peignify}, voir l'annexe A, la preuve de correction est inspirée de \cite{coq_intro}, section 3.3.
 
 
 \newpage
@@ -451,15 +451,15 @@ Cette commande prend en paramètre un fichier \textit{fsmt} décrivant le lemme 
 Puisqu'un nouveau lemme Coq est créé, l'utilisateur peut vérifier que c'est bien le but qu'il voulait prouver. Ainsi, la confiance dans les prouveurs automatiques est améliorée: on peut vérifier la réponse du prouveur.
 
 
-\subsubsection{Cas d'application de SMTCoq}
+\subsubsection{Cas d'application de SMTCoq} \label{cas_application}
 
-Dans les deux cas, les formules acceptées sont les formules logiques propositionnelles en forme prénexe. Les domaines de quantification doivent aussi être décidables. La logique est étendue avec les combinaisons des théories suivantes: arithmétique linéaire sur $\mathbb{Z}$, égalité et fonctions non-interprétées, auxquelles s'ajouteront la théorie des vecteurs de bits et la théorie des tableaux. 
+Dans les deux cas, les formules acceptées sont les formules logiques booléennes en forme prénexe. Les domaines de quantification doivent aussi être décidables. La logique est étendue avec les combinaisons des théories suivantes: arithmétique linéaire sur $\mathbb{Z}$, égalité et fonctions non-interprétées, auxquelles s'ajouteront la théorie des vecteurs de bits et la théorie des tableaux. 
 
 \subsection{Utilisation de SMTCoq}
 
 \subsubsection{La tactique $verit$}
 
-La nouvelle tactique $verit$ définie par SMTCoq permet de résoudre automatiquement les buts dans les booléens en forme prénexe. On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}. En utilisant les fonctions booléennes de Coq, $negb$ pour la négation et $>=?$ et $<=?$ pour les inégalités larges, le problème $lia5$ devient :
+La nouvelle tactique \texttt{verit} définie par SMTCoq permet de résoudre automatiquement les buts dans les booléens en forme prénexe. On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}. En utilisant les fonctions booléennes de Coq, \texttt{negb} pour la négation et \texttt{>=?} et \texttt{<=?} pour les inégalités larges, le problème $lia5$ devient :
 
 \begin{lstlisting}[frame=single]
 Lemma lia5 : 
@@ -470,11 +470,11 @@ Proof.
 Qed.
 \end{lstlisting}
 
-La tactique $verit$ commence par introduire les variables quantifiées universellement en tête de formule (dans l'exemple ce sont $x$ et $y$) puis s'attend à ne pas avoir d'autres quantificateurs. C'est ensuite la négation de la formule qui est envoyée à veriT. La reconstruction de la preuve ne peut avoir lieu que si veriT renvoie $unsat$ ainsi qu'un fichier de certificat.
+La tactique \texttt{verit} commence par introduire les variables quantifiées universellement en tête de formule (dans l'exemple ce sont \texttt{x} et \texttt{y}) puis s'attend à ne pas avoir d'autres quantificateurs. C'est ensuite la négation de la formule qui est envoyée à veriT. La reconstruction de la preuve ne peut avoir lieu que si veriT renvoie $unsat$ ainsi qu'un fichier de certificat.
 
 \subsubsection{La commande de reconstruction}
 
-La commande $Verit\_Theorem$ nous permet de créer un terme Coq à partir du certificat fourni par veriT appelé sur $lia5.smt2$. On obtient alors le terme Coq $lia5$:
+La commande \texttt{Verit\_Theorem} nous permet de créer un terme Coq à partir du certificat fourni par veriT appelé sur $lia5.smt2$. On obtient alors le terme Coq $lia5$:
 
 \includegraphics[height=2cm]{checklia5.png}
 
@@ -488,7 +488,7 @@ Nous avons vu dans la partie précédente que c'est grâce à un procédé de r�
 
 \subsection{Des certificats de toutes les couleurs} \label{des_certificats}
 
-La tactique $verit$ interprète le fichier de certificat \textit{tcertif} fourni par le prouveur automatique en un terme Coq \textit{ccertif}, ce qui permet de construire une preuve du but initial. 
+La tactique \texttt{verit} interprète le fichier de certificat \textit{tcertif} fourni par le prouveur automatique en un terme Coq \textit{ccertif}, ce qui permet de construire une preuve du but initial. 
 
 \begin{center}
 \begin{tabular}{ |c||c|c|c| } 
@@ -527,51 +527,49 @@ Le vérificateur définit en Coq un type \textit{crule} qui représente les \tex
 \subsubsection{Le type inductif \textit{crule}}\label{regroupement}
 
 
-Chaque constructeur du type inductif \textit{crule} peut représenter alternativement l'une ou l'autre d'un ensemble de \textit{trule}. Le constructeur $Res$ ne représente que la règle $resolution$ mais d'autres constructeurs peuvent représenter différentes règles en fonction de leurs paramètres. Par exemple, le constructeur $ImmBuildProj$ regroupe les règles $not\_implies0$ et $not\_implies1$ (\ref{not_implies}) et contient aussi un paramètre de type \textit{int} qui vaut $0$ ou $1$ et qui indique quelle est la \textit{trule} représentée. Ce regroupement permet d'unifier le fonctionnement de règles similaires et donc de simplifier le traitement de ces règles dans la suite du code. \medbreak
+Chaque constructeur du type inductif \textit{crule} peut représenter alternativement l'une ou l'autre d'un ensemble de \textit{trule}. Le constructeur \texttt{Res} ne représente que la règle $resolution$ mais d'autres constructeurs peuvent représenter différentes règles en fonction de leurs paramètres. Par exemple, le constructeur \texttt{ImmBuildProj} regroupe les règles $not\_implies0$ et $not\_implies1$ (\ref{not_implies}) et contient aussi un paramètre de type \textit{int} qui vaut $0$ ou $1$ et qui indique quelle est la \textit{trule} représentée. Ce regroupement permet d'unifier le fonctionnement de règles similaires et donc de simplifier le traitement de ces règles dans la suite du code. \medbreak
 
 On appellera \textit{ccertif} la liste de toutes les \textit{crule} du certificat.
 
 
 \subsubsection{La fonction récursive $checker$} \label{checker}
 
-Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état. On rappelle qu'une clause représente la disjonction d'une liste de formules. La fonction $checker$ implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisément, $checker$ est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui a aussi un paramètre état. Le résultat des \textit{crule} suit le fonctionnement des $trule$. Par exemple le résultat de $ImmBuildProj \,\, 0 \,\, 1$ est $(X)$ si le premier emplacement du tableau d'état est de la forme $(\neg (X \Rightarrow Y))$. À chaque appel de $checker$, une nouvelle \textit{crule} est consommée, son résultat est utilisé pour modifier l'emplacement courant du tableau d'état.\medbreak
+Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état. On rappelle qu'une clause représente la disjonction d'une liste de formules. La fonction \texttt{checker} implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisément, \texttt{checker} est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui a aussi un paramètre état. Le résultat des \textit{crule} suit le fonctionnement des $trule$. Par exemple le résultat de \texttt{ImmBuildProj 0 1} est $(X)$ si le premier emplacement du tableau d'état est de la forme $(\neg (X \Rightarrow Y))$. À chaque appel de \texttt{checker}, une nouvelle \textit{crule} est consommée, son résultat est utilisé pour modifier l'emplacement courant du tableau d'état.\medbreak
 
-Il n'y a pas de \textit{crule} correspondant à la règle $input$. À la place, le tableau d'état est initialisé avec le résultat de la règle $input$. Ce fonctionnement n'est possible que lorsqu'il n'y a qu'une seule règle $input$, ce qui est le cas de la tactique $verit$ (la valeur d'initialisation est la négation du but). La taille du tableau est égale au nombre de règles du \textit{tcertif}.\medbreak
+Il n'y a pas de \textit{crule} correspondant à la règle $input$. À la place, le tableau d'état est initialisé avec le résultat de la règle $input$. Ce fonctionnement n'est possible que lorsqu'il n'y a qu'une seule règle $input$, ce qui est le cas de la tactique \texttt{verit} (la valeur d'initialisation est la négation du but). La taille du tableau est égale au nombre de règles du \textit{tcertif}.\medbreak
 
 Lorsque toute la liste \textit{ccertif} a été consommée, $checker$ renvoie $true$ si le dernier emplacement modifié du tableau d'état contient la clause vide et $false$ sinon.
 
 \subsubsection{Théorème de correction}
 
-Le type des formules est réifié et on peut définir une fonction d'interprétation $interp$ qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} $cc$ et toute formule $f$, si le tableau d'état $t$ est initialisé comme décrit précédemment,  alors: 
-\[ checker  \,\, cc \,\, t \, = \, true \quad \rightarrow \quad negb \,\,  (interp \, \, f) \]
- Une fois celui-ci démontré, la preuve est obtenue en l'appliquant à la réflexivité de l'égalité. En effet, si $checker  \,\, cc\,\, t  $ est convertible à $true$, alors $checker  \,\, cc\,\, t = true $ est convertible à $true = true$.
+Le type des formules est réifié et on peut définir une fonction d'interprétation $interp$ qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} \texttt{cc} et toute formule \texttt{f}, si le tableau d'état \texttt{t} est initialisé comme décrit précédemment,  alors: 
+\[ \texttt{checker cc t = true -> negb (interp f)} \]
+ Une fois celui-ci démontré, la preuve est obtenue en l'appliquant à la réflexivité de l'égalité. En effet, si \texttt{checker cc t} est convertible à \texttt{true}, alors \texttt{checker cc t = true} est convertible à \texttt{true = true}.
 
 \subsubsection{Preuve du théorème de correction} \label{preuve_correction}
 
-On dit qu'une clause est valide lorsque son interprétation est prouvable. La preuve du théorème de correction repose sur le lemme $step\_checker\_correct$ qui s'énonce ainsi: si toutes les clauses du tableau d'état sont valides alors une étape de $checker$ modifie ce tableau en un tableau dont toutes les clauses sont valides. Il suffit en fait de vérifier que la nouvelle clause générée par $checker$ est valide. \medbreak
+On dit qu'une clause est valide lorsque son interprétation est prouvable. La preuve du théorème de correction repose sur le lemme \texttt{step\_checker\_correct} qui s'énonce ainsi: si toutes les clauses du tableau d'état sont valides alors une étape de \texttt{checker} modifie ce tableau en un tableau dont toutes les clauses sont valides. Il suffit en fait de vérifier que la nouvelle clause générée par \texttt{checker} est valide. \medbreak
 
-À partir de ce lemme on obtient une preuve du théorème de correction. Supposons que le lemme initial (la négation du but dans le cas de la tactique $verit$) soit prouvable. Initialement, le tableau d'état ne contient donc que des clauses valides et, d'après $step\_checker\_correct$, cette propriété est conservée par la fonction $checker$. Si  de plus $checker$ renvoie $true$ cela veut dire qu'il y a la clause vide dans le dernier tableau d'état. L'interprétation de la clause vide nous conduit à une contradiction.
+À partir de ce lemme on obtient une preuve du théorème de correction. Supposons que le lemme initial (la négation du but dans le cas de la tactique \texttt{verit}) soit prouvable. Initialement, le tableau d'état ne contient donc que des clauses valides et, d'après \texttt{step\_checker\_correct}, cette propriété est conservée par la fonction \texttt{checker}. Si de plus \texttt{checker} renvoie \texttt{true} cela veut dire qu'il y a la clause vide dans le dernier tableau d'état. L'interprétation de la clause vide nous conduit à une contradiction.
 
 
 \subsubsection{Exemple de l'identité}
 
-Considérons la proposition Coq suivante où $implb$ est l'implication booléenne:
+Considérons la proposition Coq suivante où \texttt{implb} est l'implication booléenne:
 \begin{lstlisting}[frame=single]
   Proposition identity A : implb A A.
 \end{lstlisting}
 
-L'emplacement courant, c'est-à-dire l'emplacement du tableau d'état à modifier lors d'un appel de $checker$, initialisé à 2 et est incrémenté à chaque appel de $checker$. C'est encore le même fonctionnement que les certificats de veriT. \medbreak
+L'emplacement courant, c'est-à-dire l'emplacement du tableau d'état à modifier lors d'un appel de \texttt{checker}, initialisé à 2 et est incrémenté à chaque appel de \texttt{checker}. C'est encore le même fonctionnement que les certificats de veriT. \medbreak
 
-Lorsqu'on applique $verit$, puisque c'est la négation du but qui est envoyée, le prouveur automatique nous renvoie le \textit{tcertif} de \ref{not_implies}. Celui-ci est traduit par SMTCoq en un \textit{ccertif} $cc$ et l'état est initialisé en un tableau $t$ avec  
-$cc := [ImmBuildProj \,\, 0 \,\, 1; \,ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 \,\, 3] $ et $t := [|nid; nid; nid; nid|]$ où $nid$ est la clause $( \neg (A \Rightarrow A))$.
+Lorsqu'on applique \texttt{verit}, puisque c'est la négation du but qui est envoyée, le prouveur automatique nous renvoie le \textit{tcertif} de \ref{not_implies}. Celui-ci est traduit par SMTCoq en un \textit{ccertif} \texttt{cc} et l'état est initialisé en un tableau \texttt{t} avec $\texttt{cc := [ImmBuildProj 0 1; ImmBuildProj 1 1; Res 2 3] }$ et $\texttt{t := [|nid; nid; nid; nid|]}$ où \texttt{nid} est la clause $(\neg (A \Rightarrow A))$.
 \begin{align*}
-    checker \,\, cc \,\, t &\equiv checker \,\, [ImmBuildProj \,\, 0 \,\, 1; \,ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 \,\, 3] \,\, [| nid; nid; nid; nid|] \\
-    &\equiv checker \,\, [ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 \,\, 3] \,\, [| nid; (A); nid; nid|] \\
-    &\equiv checker \,\, [Res \,\, 2 \,\, 3] \,\, [| nid; (A); (\neg A); nid|] \\
-    &\equiv checker \,\, [] \,\, [| nid; (A); (\neg A); ()|] \\
-    &\equiv true
+  \texttt{checker cc t } &\equiv \,\, \texttt{checker [ImmBuildProj 1 1; Res 2 3] [|nid; }(A)\texttt{; nid; nid|]} \\
+    &\equiv \,\, \texttt{checker [Res 2 3] [|nid; }(A)\texttt{; }(\neg A)\texttt{; nid|]} \\
+    &\equiv \,\, \texttt{checker [] [|nid; }(A)\texttt{; }(\neg A)\texttt{; }()\texttt{|]} \\
+    &\equiv \,\, \texttt{true}
 \end{align*}
-En appliquant le théorème de correction, on obtient $negb \,\,  (interp \,\, (\neg (A \Rightarrow A)))$ qui est convertible à $negb\,\, (negb\,\, (implb\,\, A \,\,A))$. Cette proposition est bien équivalente à $implb\,\, A \,\,A$.
+En appliquant le théorème de correction, on obtient \texttt{negb (interp (}$\neg (A \Rightarrow A)$\texttt{))} qui est convertible à \texttt{negb (negb (implb A A))}. Cette proposition est bien équivalente à \texttt{implb A A}.
 
 \subsection{Le préprocesseur}
 
@@ -584,13 +582,12 @@ Les avantages d'une étape intermédiaire de compilation des certificats sont mu
 
 \subsubsection{Allocation dans le tableau d'état} \label{alloc}
 
-On remarque que dans l'exemple précédent, le tableau d'état n'a pas besoin d'être aussi grand: 2 emplacements suffisent pour ce certificat. Pour réduire l'espace mémoire utilisé, il faut calculer le nombre maximum de clauses à retenir à chaque étape du $checker$, c'est ce que fait la fonction $alloc$. La taille du tableau d'état est fixée à cette valeur. Cette fonction assigne aussi une position dans un nouveau paramètre des \textit{orule} qui sert à déterminer l'emplacement courant. Nous noterons ce paramètre de position au début, de sorte que lorsque $checker$ rencontre la \textit{crule} $ImmBuildProj \,\, 1\,\, 0 \,\, 2$, le premier emplacement de l'état est modifié en $(X)$ si le deuxième emplacement de l'état contient $\neg(X \Rightarrow Y)$. Puisque les emplacements des clauses sont modifiés, il faut aussi modifier les dépendances des règles. Enfin, $checker$ prend un paramètre (dans l'exemple ce paramètre est $1$) qui indique quelle est la position de la dernière règle, le résultat de la dernière règle n'étant pas nécessairement au dernier emplacement du tableau d'état comme précédemment.
+On remarque que dans l'exemple précédent, le tableau d'état n'a pas besoin d'être aussi grand: 2 emplacements suffisent pour ce certificat. Pour réduire l'espace mémoire utilisé, il faut calculer le nombre maximum de clauses à retenir à chaque étape du \texttt{checker}, c'est ce que fait la fonction $alloc$. La taille du tableau d'état est fixée à cette valeur. Cette fonction assigne aussi une position dans un nouveau paramètre des \textit{orule} qui sert à déterminer l'emplacement courant. Nous noterons ce paramètre de position au début, de sorte que lorsque \texttt{checker} rencontre \texttt{ImmBuildProj 1 0 2}, le premier emplacement de l'état est modifié en $(X)$ si le deuxième emplacement de l'état contient $\neg(X \Rightarrow Y)$. Puisque les emplacements des clauses sont modifiés, il faut aussi modifier les dépendances des règles. Enfin, \texttt{checker} prend un paramètre (dans l'exemple ce paramètre est \texttt{1}) qui indique quelle est la position de la dernière règle, le résultat de la dernière règle n'étant pas nécessairement au dernier emplacement du tableau d'état comme précédemment. En posant \texttt{cc} comme précédemment et \texttt{t := [|nid; nid|]}, on a :
 \begin{align*}
-    checker \,\, cc \,\, t \,\, 1 &\equiv checker \,\, [ImmBuildProj \,\, 1\,\, 0 \,\, 2; \,ImmBuildProj \,\, 2\,\, 1 \,\, 2; \, Res \,\, 1 \,\, 1 \,\, 2] \,\, [| nid; nid|] \,\, 1 \\
-    &\equiv checker \,\, [ImmBuildProj \,\, 2 \,\, 1 \,\, 2; \, Res \,\, 1 \,\, 1 \,\, 2] \,\, [| (A); nid|] \,\, 1 \\
-    &\equiv checker \,\, [Res \,\, 1 \,\, 1 \,\, 2] \,\, [| (A); (\neg A)|] \,\, 1 \\
-    &\equiv checker \,\, [] \,\, [| (); (\neg A)|] \,\, 1 \\
-    &\equiv true
+  \texttt{checker cc t 1} &\equiv \texttt{checker [ImmBuildProj 2 1 2; Res 1 1 2] [|}(A)\texttt{; nid|] 1} \\
+    &\equiv \texttt{checker [Res 1 1 2] [|}(A)\texttt{; }(\neg A)\texttt{|] 1} \\
+    &\equiv \texttt{checker [] [|}()\texttt{; }(\neg A)\texttt{|] 1} \\
+    &\equiv \texttt{true}
 \end{align*}
 
 
