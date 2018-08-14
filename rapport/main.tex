@@ -113,7 +113,7 @@ Pendant mon stage, je me suis attaché à améliorer l'expressivité de SMTCoq d
 
 En plus des tests présents dans SMTCoq initialement, le code final passe d'autres tests pour s'assurer du gain d'expressivité dû au rajout des lemmes et des quantificateurs. J'ai, par exemple, pu vérifier des propriétés, automatiquement et dans Coq, en théorie des groupes, dans une théorie formalisant les listes d'entiers, sur des fonctions définies récursivement, etc.
 
-D'autre part, ma contribution respecte le principe sceptique de SMTCoq (\ref{sceptique_autarcique}), le développement et le calcul étant faits principalement en Ocaml, en dehors de l'assistant de preuve. Cet aspect donne une meilleure robustesse à SMTCoq face aux changements internes des prouveurs automatiques.
+D'autre part, ma contribution respecte le principe sceptique de SMTCoq (\ref{sceptique_autarcique}), le développement et le calcul étant faits principalement en OCaml, en dehors de l'assistant de preuve. Cet aspect donne une meilleure robustesse à SMTCoq face aux changements internes des prouveurs automatiques.
 
 
 \subsection{Bilan et perspectives}\label{persp}
@@ -133,13 +133,13 @@ Ces améliorations de l'expressivité et de l'efficacité combinées avec la fac
 
 \subsection{Assistants de preuve}\label{assistants}
 
-Les assistants de preuves sont des outils puissants qui permettent d'exprimer des théorèmes complexes puis de les vérifier de manière interactive. Ils proposent à un utilisateur de formuler son problème puis de le démontrer, le rôle principal de l'assistant de preuve étant alors de vérifier que la preuve fournie est correcte. Pour une propriété donnée, l'utilisateur doit donc construire une preuve parfaitement rigoureuse et exhaustive de la propriété ce qui peut rendre le processus de vérification long et fastidieux. La confiance accordée à ces outils dépend de la compréhension que l'on peut avoir dans son noyau, étant donné que c'est la partie sur laquelle repose la vérification. Cette compréhension est facilitée lorsque l'implantation de la logique de ce noyau est de taille réduite. \medbreak
+Les assistants de preuves sont des outils puissants qui permettent d'exprimer des théorèmes complexes puis de les vérifier de manière interactive. Ils proposent à un utilisateur de formuler son problème puis de le démontrer, le rôle principal de l'assistant de preuve étant alors de vérifier que la preuve fournie est correcte. Pour une propriété donnée, l'utilisateur doit donc construire une preuve parfaitement rigoureuse et exhaustive de la propriété ce qui peut rendre le processus de vérification long et fastidieux. La confiance accordée à ces outils dépend de la compréhension que l'on peut avoir dans son noyau, étant donné que c'est la partie sur laquelle repose la vérification. Afin de faciliter cette compréhension, les assistants de preuve favorisent une implantation dans un langage de haut niveau proche de la logique de leur noyau tel que OCaml. L'accent est mis sur la concision et la clarté du code. \medbreak
 
 Dans la suite nous utiliserons Coq comme assistant de preuve. La logique de son noyau se fonde sur le calcul des constructions inductives \cite{coq_intro} (ou types inductifs). La sémantique du langage n'est pas donnée en détail dans ce rapport mais les aspects importants seront précisés au moment de leur utilisation. La partie \ref{coq} introduit deux techniques d'utilisation de Coq. 
 
 \subsection{Prouveurs automatiques}\label{prouveurs}
 
-Les prouveurs automatiques, quant à eux, ne demandent pas de preuves de la part de l'utilisateur. L'effort de certification est alors réduit à la formalisation du problème et dans certains cas le prouveur donne une trace de son exécution appelée certificat. En contrepartie, la logique d'un prouveur automatique est plus limitée et/ou la réponse en temps fini n'est pas garantie.\medbreak
+Les prouveurs automatiques, quant à eux, ne demandent pas de preuves de la part de l'utilisateur. L'effort de certification est alors réduit à la formalisation du problème et dans certains cas le prouveur donne une trace de son exécution appelée certificat. En contrepartie, la logique d'un prouveur automatique est plus limitée et/ou la réponse en temps fini n'est pas garantie. Puisque le prouveur automatique doit rechercher la preuve du théorème entré, l'efficacité de l'implantation est capitale. Pour cette raison, les prouveurs automatiques sont écrits dans des langages de plus bas niveau tels que C ou C\texttt{++}. \medbreak
 
 La partie \ref{fonctionnement_prouveurs} détaille le fonctionnement des prouveurs automatiques ainsi que l'utilisation que nous en ferons.
 
@@ -156,7 +156,11 @@ Les fragments de code Coq fournis sont encadrés et sont compilables lorsqu'ils 
   Require Import SMTCoq Bool.
   Open Scope Z_scope.
 \end{lstlisting}
-Cela requiert l'installation de SMTCoq, disponible à l'adresse \textit{https://github.com/smtcoq/smtcoq}. On préférera la version utilisant native-coq \cite{native-coq}.
+Cela requiert l'installation de SMTCoq, disponible à l'adresse
+\begin{align*}
+    \text{https://github.com/smtcoq/smtcoq}
+\end{align*}
+On préférera la version utilisant native-coq \cite{native-coq}.
 
 
 \newpage
@@ -197,7 +201,6 @@ On peut alors faire des preuves sur les éléments de ce type inductif:
 \begin{lstlisting}[frame=single]
 Definition t := And (And (Bool true) (Bool false)) (And (Bool true) (Bool true)).
 
-
 Lemma Interp_t_false : Interp t false.
 Proof.
   eapply InterpAnd ; [
@@ -236,8 +239,8 @@ Qed.
 
 En effet, en notant $a \equiv b$ lorsque $a$ est convertible à $b$, on a:
 \begin{align*}
-  interp \,\,t \equiv \,\, &interp\,\, (And \,\,(Bool \,\,true) \,\,(Bool \,\,false)) \,\,\&\& \,\, 
-  \,\, interp\,\, (And \,\,(Bool\,\, true) \,\,(Bool\,\, true)) \\
+  interp \,\,t \equiv \,\, &interp\,\, (And \,\,(Bool \,\,true) \,\,(Bool \,\,false)) \,\,\&\& \,\, \\
+  \,\, &interp\,\, (And \,\,(Bool\,\, true) \,\,(Bool\,\, true)) \\
   \equiv \,\, &(interp \,\,(Bool \,\,true) \,\,\&\&\,\, interp \,\,(Bool \,\,false)) \,\,\&\&\,\, \\
   &(interp\,\, (Bool \,\,true) \,\,\&\&\,\, interp \,\,(Bool\,\, true)) \\
   \equiv \,\, &(true \,\,\&\&\,\, false) \,\,\&\&\,\, (true \,\,\&\&\,\, true) \\
@@ -268,7 +271,7 @@ Pour cela, on a besoin de récupérer la structure du booléen $u$, c'est l'éta
 
 Il n'est pas possible d'écrire en Coq une fonction qui détermine la forme conjonctive d'un argument booléen. En effet, le type $bool$ n'ayant que deux constructeurs ($true$ et $false$), inspecter par \textit{pattern-matching} nous donnera un de ces deux constructeurs.\medbreak
 
-Une solution est d'étudier la structure du terme en question à partir de sa représentation Ocaml sous-jacente. C'est l'approche utilisée par SMTCoq. \medbreak
+Une solution est d'étudier la structure du terme en question à partir de sa représentation OCaml sous-jacente. C'est l'approche utilisée par SMTCoq. \medbreak
 
 Il est aussi possible d'utiliser des tactiques qui renvoient un terme. Dans le cas des formules conjonctives, on définit:
 \begin{lstlisting}[frame=single]
@@ -423,14 +426,16 @@ Dans l'approche sceptique, le certificat renvoyé par le prouveur automatique es
 
 Chacune des tactiques Coq définies par SMTCoq invoque un prouveur automatique différent: zChaff, CVC4 ou veriT. Ces tactiques permettent à l'utilisateur Coq de faire appel à un prouveur automatique pour résoudre le but courant et donc de profiter de l'automatisation du prouveur. \medbreak
 
-Les prouveurs automatiques fournissent un certificat uniquement dans le cas où le problème n'est pas satisfiable (\ref{sortie}). Pour utiliser ce fonctionnement, SMTCoq envoie la négation du but au prouveur automatique. La preuve ne peut être reconstruite que dans le cas où la réponse est $unsat$ et est accompagnée d'un fichier de certificat. Ce fichier prouve que la négation du but mène à l'absurde. Autrement dit, on obtient une preuve de la double négation du but. Les domaines des variables étant toujours supposés décidables dans SMTCoq, on récupère une preuve du but initial.
+
+
+Les prouveurs automatiques fournissent un certificat uniquement dans le cas où le problème n'est pas satisfiable (\ref{sortie}). Pour utiliser ce fonctionnement, SMTCoq envoie la négation du but au prouveur automatique. La preuve ne peut être reconstruite que dans le cas où la réponse est $unsat$ et est accompagnée d'un fichier de certificat. Ce fichier prouve que la négation du but mène à l'absurde. Autrement dit, on obtient une preuve de la double négation du but. On fera en sorte que ce dernier soit du type des booléens. Les prédicats utilisés doivent donc être à valeurs booléennes, en particulier les domaines des variables doivent être décidables.  Le but étant du type des booléens, on récupère une preuve du but initial.
 
 \begin{center}
     \includegraphics[height=5cm]{Automatisation.pdf}
 \end{center}
 
 La première étape est la réification, le lemme est traduit dans l'AST des formules acceptées par SMTCoq. Le prouveur automatique est appelé à partir de cet AST. En cas de succès de ce prouveur, on obtient un certificat de preuve. 
-Il s'agit ensuite de rejouer ce certificat en Coq (voir partie \ref{transformation_certif}). Pour utiliser le vérificateur de SMTCoq il faut mettre le certificat dans une forme adaptée à celui-ci. Le préprocesseur effectue une étape de \textit{parsing} du certificat qui se souvient des sous-formules déjà rencontrées (\textit{hash-consing}) à l'aide de tables de hachage.  Il y a aussi une étape d'adaptation de ces certificats. En effet, les prouveurs automatiques peuvent parfois ne pas mentionner une étape de la preuve qu'il faut alors construire. De plus, il faut pouvoir adapter les certificats fournis par le prouveur automatiques qui peuvent reposer sur une logique différente de celle de Coq. 
+Il s'agit ensuite de rejouer ce certificat en Coq (voir partie \ref{transformation_certif}). Il faut pour cela mettre le certificat dans une forme adaptée au vérificateur SMTCoq afin qu'il puisse l'interpréter et créer un terme de preuve. Le préprocesseur effectue une étape de \textit{parsing} du certificat qui se souvient des sous-formules déjà rencontrées (\textit{hash-consing}) à l'aide de tables de hachage.  Il y a aussi une étape d'adaptation de ces certificats. En effet, les prouveurs automatiques peuvent parfois ne pas mentionner une étape de la preuve qu'il faut alors construire. De plus, il faut pouvoir adapter les certificats fournis par le prouveur automatiques qui peuvent reposer sur une logique différente de celle de Coq. 
 
 
 \subsubsection{Amélioration de la confiance} \label{confiance}
@@ -488,7 +493,7 @@ La tactique $verit$ interprète le fichier de certificat \textit{tcertif} fourni
 \begin{center}
 \begin{tabular}{ |c||c|c|c| } 
  \hline
- Format & Fichier texte & Code Ocaml & Code Coq \\ 
+ Format & Fichier texte & Code OCaml & Code Coq \\ 
  \hline
  Appellation & \textit{tcertif} & \textit{ocertif} & \textit{ccertif} \\ 
  \hline
@@ -497,7 +502,7 @@ La tactique $verit$ interprète le fichier de certificat \textit{tcertif} fourni
 \end{tabular}
 \end{center}
 
-Cette interprétation passe par une étape intermédiaire \textit{ocertif} écrite en Ocaml. Cette étape a plusieurs avantages. En premier lieu, elle permet d'utiliser les outils de \textit{parsing} du fichier de certificat (ocamllex, ocamlyacc). Par ailleurs, en utilisant la représentation Ocaml des termes Coq, la traduction d'un \textit{ocertif} en un \textit{ccertif} est facilitée. Enfin, les \textit{ocertif} sont définis dans un format facilement manipulable ce qui permet d'appliquer des adaptations (\ref{processing_forallinst}), des simplifications (\ref{regroupement}) ou encore des optimisations (\ref{alloc}).
+Cette interprétation passe par une étape intermédiaire \textit{ocertif} écrite en OCaml. Cette étape a plusieurs avantages. En premier lieu, elle permet d'utiliser les outils de \textit{parsing} du fichier de certificat ($ocamllex$, $ocamlyacc$). Par ailleurs, en utilisant la représentation OCaml des termes Coq, la traduction d'un \textit{ocertif} en un \textit{ccertif} est facilitée. Enfin, les \textit{ocertif} sont définis dans un format facilement manipulable ce qui permet d'appliquer des adaptations (\ref{processing_forallinst}), des simplifications (\ref{regroupement}) ou encore des optimisations (\ref{alloc}).
 
 \subsection{Transformation de Tseitin et \textit{hash-consing}} \label{tseitin}
 
@@ -550,9 +555,9 @@ On dit qu'une clause est valide lorsque son interprétation est prouvable. La pr
 
 \subsubsection{Exemple de l'identité}
 
-Considérons le but Coq suivant où $implb$ est l'implication booléenne:
+Considérons la proposition Coq suivante où $implb$ est l'implication booléenne:
 \begin{lstlisting}[frame=single]
-  Lemma identity A : implb A A.
+  Proposition identity A : implb A A.
 \end{lstlisting}
 
 L'emplacement courant, c'est-à-dire l'emplacement du tableau d'état à modifier lors d'un appel de $checker$, initialisé à 2 et est incrémenté à chaque appel de $checker$. C'est encore le même fonctionnement que les certificats de veriT. \medbreak
@@ -566,15 +571,15 @@ $cc := [ImmBuildProj \,\, 0 \,\, 1; \,ImmBuildProj \,\, 1 \,\, 1; \, Res \,\, 2 
     &\equiv checker \,\, [] \,\, [| nid; (A); (\neg A); ()|] \\
     &\equiv true
 \end{align*}
-En appliquant le théorème de correction, on obtient $negb \,\,  (interp \,\, (\neg (A \Rightarrow A)))$ qui est convertible à $negb\,\, (negb\,\, (implb\,\, A \,\,A))$. On a vu que (\ref{negation}), dans le cadre de SMTCoq, on peut alors obtenir $implb \,\, A \,\, A$.
+En appliquant le théorème de correction, on obtient $negb \,\,  (interp \,\, (\neg (A \Rightarrow A)))$ qui est convertible à $negb\,\, (negb\,\, (implb\,\, A \,\,A))$. Cette proposition est bien équivalente à $implb\,\, A \,\,A$.
 
 \subsection{Le préprocesseur}
 
 Les avantages d'une étape intermédiaire de compilation des certificats sont multiples (\ref{des_certificats}). Nous détaillons le format utilisé puis nous donnons une optimisation rendue possible par cette étape.
 
-\subsubsection{Le type Ocaml \textit{orule}}
+\subsubsection{Le type OCaml \textit{orule}}
 
- Les \textit{orule} sont des enregistrements constitués, en plus du code Ocaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ $prev$ et un champ $next$. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ $used$ de type \textit{int} qui est utilisé par la fonction $alloc$.
+ Les \textit{orule} sont des enregistrements constitués, en plus du code OCaml d'une \textit{crule}, de méta-données qui permettent leur modification. En particulier, les \textit{orule} contiennent un champ $prev$ et un champ $next$. Ainsi, un \textit{ocertif} est une liste doublement chaînée de \textit{orule}. Les \textit{orule} contiennent aussi un champ $used$ de type \textit{int} qui est utilisé par la fonction $alloc$.
 
 
 \subsubsection{Allocation dans le tableau d'état} \label{alloc}
@@ -755,7 +760,9 @@ Ce stage s'inscrit dans une approche automatique de la démonstration dans un as
 D'autres outils sont disponibles dans ce cadre, à commencer par Coqhammer \cite{coqhammer} qui est aussi un \textit{plugin} pour Coq qui utilise des prouveurs automatiques. À la différence de SMTCoq, lors de la reconstruction de la preuve, Coqhammer liste les lemmes qui apparaissent dans le certificat et n'utilise rien d'autre que cette liste du certificat. Ainsi, il y a une recherche qui est faite par des tactiques en Coq et qui permet de retrouver la preuve. Cette méthode est plus robuste que celle  de SMTCoq vis-à-vis des prouveurs automatiques mais demande de chercher à nouveau la preuve et est donc plus coûteuse. De la même manière, pour retrouver les instanciations des lemmes (partie \ref{instanciations}), la recherche a été faite en Coq. Cette méthode s'est avérée utile pour passer outre certaines différences entre instances et lemmes. Un autre point de divergence est que SMTCoq propose aussi une commande de vérification ce qui permet d'améliorer la confiance accordée aux prouveurs automatiques (\ref{confiance}).
 
 
-On peut aussi mentionner Sledgehammer \cite{sledgehammer_manual} qui est un outil développé pour l'assistant de preuve Isabelle afin d'y intégrer une interface sceptique avec des prouveurs automatiques. Sledgehammer a mis en place un sélectionneur de lemmes qui apprend quels lemmes il est judicieux d'envoyer aux prouveurs automatiques \cite{hol_selector}.\medbreak
+Un autre outil qui a une interface sceptique avec des prouveurs automatiques est Sledgehammer \cite{sledgehammer_manual} qui est  développé pour l'assistant de preuve Isabelle. L'idée d'un sélectionneur de lemmes qui apprend quels lemmes il est judicieux d'envoyer aux prouveurs automatiques \cite{hol_selector} vient de Sledgehammer.
+
+On peut aussi mentionner des approches autarciques de la démonstration automatique comme la tactique $unsat$ \cite{smt_autarcique} qui utilise la réflexion calculatoire ou encore la tactique $metis$ en Isabelle. \medbreak
 
 En résumé, ce stage a permis d'améliorer l'expressivité de SMTCoq tout en restant dans un cadre qui assure la correction de la méthode. Cette amélioration de l'expressivité a été confirmée par de nouveaux tests. Enfin, ce stage ouvre de nouvelles pistes de travail (\ref{persp}), on peut améliorer l'efficacité, étendre les cas d'application ou encore utiliser SMTCoq pour la certification Why3.
 
