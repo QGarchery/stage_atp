@@ -179,27 +179,27 @@ Inductive AndTree :=
 | And (_ _: AndTree).
 \end{lstlisting}
 
-et définissons un type inductif qui donne son évaluation: 
+et définissons un type inductif qui donne son interprétation: 
 
 \begin{lstlisting}[frame=single]
-Inductive Evaluation : AndTree -> bool -> Prop :=
-  EvalBool b :
-    Evaluation (Bool b) b
-| EvalAnd b1 b2 b3 t1 t2 :
-    Evaluation t1 b1 -> Evaluation t2 b2 -> b1 && b2 = b3 ->
-    Evaluation (And t1 t2) b3.
+Inductive Interp : AndTree -> bool -> Prop :=
+  InterpBool b :
+    Interp (Bool b) b
+| InterpAnd b1 b2 b3 t1 t2 :
+    Interp t1 b1 -> Interp t2 b2 -> b1 && b2 = b3 ->
+    Interp (And t1 t2) b3.
 \end{lstlisting}
-$Evaluation \, t \, b$ signifie que l'arbre $t$ s'évalue en un booléen $b$. Cette définition suit la définition des formules conjonctives. En effet, il y a bien deux cas, $EvalBool$ pour les feuilles de l'arbre et $EvalAnd$ pour les noeuds. Le cas $EvalAnd$ s'explique ainsi: si $t1$ s'évalue en $b1$ et $t2$ s'évalue en $b2$ alors $And \, t1 \, t2$ s'évalue en $b1\,\&\&\,b2$.  On a utilisé la fonction Coq $andb$ notée $\&\&$ qui implémente la conjonction booléenne.
+$Interp \, t \, b$ signifie que l'arbre $t$ s'interprète en un booléen $b$. Cette définition suit la définition des formules conjonctives. En effet, il y a bien deux cas, $InterpBool$ pour les feuilles de l'arbre et $InterpAnd$ pour les noeuds. Le cas $InterpAnd$ s'explique ainsi: si $t1$ s'interprète en $b1$ et $t2$ s'interprète en $b2$ alors $And \, t1 \, t2$ s'interprète en $b1\,\&\&\,b2$.  On a utilisé la fonction Coq $andb$ notée $\&\&$ qui implémente la conjonction booléenne.
 
 On peut alors faire des preuves sur les éléments de ce type inductif: 
 \begin{lstlisting}[frame=single]
 Definition t := And (And (Bool true) (Bool false)) (And (Bool true) (Bool true)).
 
-Lemma Eval_t_false : Evaluation t false.
+Lemma Interp_t_false : Interpuation t false.
 Proof.
-  eapply EvalAnd ; [
-    eapply EvalAnd ; [ apply EvalBool | apply EvalBool | reflexivity ]
-  | eapply EvalAnd ; [ apply EvalBool | apply EvalBool | reflexivity ]
+  eapply InterpAnd ; [
+    eapply InterpAnd ; [ apply InterpBool | apply InterpBool | reflexivity ]
+  | eapply InterpAnd ; [ apply InterpBool | apply InterpBool | reflexivity ]
   | reflexivity ].
 Qed.
 \end{lstlisting}
@@ -208,21 +208,21 @@ Qed.
 
 La réflexion calculatoire repose sur la convertibilité de deux termes: deux termes sont convertibles lorsqu'ils se réduisent vers un même terme. Aussi, à chaque nouvelle définition, la nouvelle constante qui est définie est convertible à sa définition. \\
 
-Plutôt que d'utiliser un prédicat qui prend une formule conjonctive $t$ et un booléen $b$, et qui vérifie que $t$ s'évalue en $b$, on peut utiliser une fonction récursive qui calcule l'évaluation et combiner cette fonction récursive avec le prédicat de l'égalité. On peut ensuite montrer que les deux formalisations sont bien équivalentes.  
+Plutôt que d'utiliser un prédicat qui prend une formule conjonctive $t$ et un booléen $b$, et qui vérifie que $t$ s'interprète en $b$, on peut utiliser une fonction récursive qui calcule l'interprétation et combiner cette fonction récursive avec le prédicat de l'égalité. On peut ensuite montrer que les deux formalisations sont bien équivalentes.  
 \begin{lstlisting}[frame=single]
-Fixpoint evaluation (t : AndTree) :=
+Fixpoint interp (t : AndTree) :=
   match t with
     Bool b => b
-  | And t1 t2 => evaluation t1 && evaluation t2
+  | And t1 t2 => interp t1 && interp t2
   end.
   
-Proposition Eval_eq_eval t b :
-  Evaluation t b <-> evaluation t = b.
+Proposition Interp_eq_interp t b :
+  Interp t b <-> interp t = b.
 \end{lstlisting}
 
-L'avantage de cette nouvelle définition de l'évaluation est que, grâce à la convertibilité de $evaluation$ avec sa définition, on a une preuve triviale de la propriété.
+L'avantage de cette nouvelle définition de l'interprétation est que, grâce à la convertibilité de $interp$ avec sa définition, on a une preuve triviale de la propriété.
 \begin{lstlisting}[frame=single]
-Lemma eval_t_false : evaluation t = false.
+Lemma interp_t_false : interp t = false.
 Proof.
   reflexivity.
 Qed.
@@ -230,10 +230,10 @@ Qed.
 
 En effet, en notant $a \equiv b$ lorsque $a$ est convertible à $b$, on a:
 \begin{align*}
-  evaluation \,\,t \equiv \,\, &evaluation\,\, (And \,\,(Bool \,\,true) \,\,(Bool \,\,false)) \,\,\&\& \,\, \\
-  \,\, &evaluation\,\, (And \,\,(Bool\,\, true) \,\,(Bool\,\, true)) \\
-  \equiv \,\, &(evaluation \,\,(Bool \,\,true) \,\,\&\&\,\, evaluation \,\,(Bool \,\,false)) \,\,\&\&\,\, \\
-  &(evaluation\,\, (Bool \,\,true) \,\,\&\&\,\, evaluation \,\,(Bool\,\, true)) \\
+  interp \,\,t \equiv \,\, &interp\,\, (And \,\,(Bool \,\,true) \,\,(Bool \,\,false)) \,\,\&\& \,\, \\
+  \,\, &interp\,\, (And \,\,(Bool\,\, true) \,\,(Bool\,\, true)) \\
+  \equiv \,\, &(interp \,\,(Bool \,\,true) \,\,\&\&\,\, interp \,\,(Bool \,\,false)) \,\,\&\&\,\, \\
+  &(interp\,\, (Bool \,\,true) \,\,\&\&\,\, interp \,\,(Bool\,\, true)) \\
   \equiv \,\, &(true \,\,\&\&\,\, false) \,\,\&\&\,\, (true \,\,\&\&\,\, true) \\
   \equiv\,\, &false \,\,\&\&\,\, (true \,\,\&\&\,\, true) \\
   \equiv\,\, &false
@@ -281,7 +281,7 @@ Ltac reify A :=  match A with
 
 Le terme $u = (b1\,\&\&\,b2)\,\&\&\,(b3\,\&\&\,b4)$ réifié donne bien 
 \[And\,(And\,(Bool\,b1)\,(Bool\,b2))\,(And\,(Bool\,b3)\,(Bool\,b4))\] 
-et on notera que l'évaluation de ce nouveau terme est égale à $u$.
+et on notera que l'interprétation de ce nouveau terme est égale à $u$.
 
 
 
@@ -290,9 +290,9 @@ et on notera que l'évaluation de ce nouveau terme est égale à $u$.
 L'intérêt de la réification est que la structure du terme réifié est mise en évidence. Il devient alors possible de manipuler explicitement cette structure. \\
 
 Par exemple, sur le type $AndTree$, il est possible de définir une fonction $peigne$ qui renvoie l'arbre en argument mis sous forme de peigne. Le théorème de correction de cette fonction établit que 
-\[ \forall t \in AndTree, \, evaluation \,\, (peigne \,\, t) = evaluation \,\, t \]
+\[ \forall t \in AndTree, \, interp \,\, (peigne \,\, t) = interp \,\, t \]
 
-Ce théorème de correction n'est applicable que si on a un terme de la forme $evaluation \,\, x$, forme que l'on peut obtenir en remarquant que pour tout terme booléen $b$, l'évaluation de la réification de $b$ est convertible à $b$.\\
+Ce théorème de correction n'est applicable que si on a un terme de la forme $interp \,\, x$, forme que l'on peut obtenir en remarquant que pour tout terme booléen $b$, l'interprétation de la réification de $b$ est convertible à $b$.\\
 
 En combinant tous ces résultats, on peut définir une tactique $peignify$ qui met les formules conjonctives en forme de peigne. Cette tactique permet par exemple de démontrer le lemme suivant: 
 
@@ -540,13 +540,13 @@ Lorsque toute la liste \textit{ccertif} a été consommée, $checker$ renvoie $t
 
 \subsubsection{Théorème de correction}
 
-Le type des formules est réifié et on peut définir une fonction d'évaluation $evaluation$ qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} $cc$ et toute formule $f$, si le tableau d'état $t$ est initialisé comme décrit précédemment,  alors: 
-\[ checker  \,\, cc \,\, t \, = \, true \quad \rightarrow \quad \sim  evaluation \, \, f \]
+Le type des formules est réifié et on peut définir une fonction d'interprétation $interp$ qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} $cc$ et toute formule $f$, si le tableau d'état $t$ est initialisé comme décrit précédemment,  alors: 
+\[ checker  \,\, cc \,\, t \, = \, true \quad \rightarrow \quad \sim  interp \, \, f \]
 où $\sim A$ est la négation de $A$ en Coq. Une fois celui-ci démontré, la preuve est obtenue en l'appliquant à la réflexivité de l'égalité. En effet, si $checker  \,\, cc\,\, t  $ est convertible à $true$, alors $checker  \,\, cc\,\, t = true $ est convertible à $true = true$.
 
 \subsubsection{Preuve du théorème de correction} \label{preuve_correction}
 
-On dit qu'une clause est valide lorsque son évaluation est prouvable. La preuve du théorème de correction repose sur le lemme $step\_checker\_correct$ qui s'énonce ainsi: si toutes les clauses du tableau d'état sont valides alors une étape de $checker$ modifie ce tableau en un tableau dont toutes les clauses sont valides. Il suffit en fait de vérifier que la nouvelle clause générée par $checker$ est valide. \\ 
+On dit qu'une clause est valide lorsque son interprétation est prouvable. La preuve du théorème de correction repose sur le lemme $step\_checker\_correct$ qui s'énonce ainsi: si toutes les clauses du tableau d'état sont valides alors une étape de $checker$ modifie ce tableau en un tableau dont toutes les clauses sont valides. Il suffit en fait de vérifier que la nouvelle clause générée par $checker$ est valide. \\ 
 
 À partir de ce lemme on obtient une preuve du théorème de correction. Supposons que le lemme initial (la négation du but dans le cas de la tactique $verit$) soit prouvable. Initialement, le tableau d'état ne contient donc que des clauses valides et, d'après $step\_checker\_correct$, cette propriété est conservée par la fonction $checker$. Si  de plus $checker$ renvoie $true$ cela veut dire qu'il y a la clause vide dans le dernier tableau d'état. L'interprétation de la clause vide nous conduit à une contradiction.
 
@@ -566,7 +566,7 @@ $cc = [ImmBuildProj \,\, 0 \,\, 0; \,ImmBuildProj \,\, 1 \,\, 0; \, Res \,\, 1 \
     &\equiv checker \,\, [] \,\, [| nid; (A); (\neg A); ()|] \\
     &\equiv true
 \end{align*}
-En appliquant le théorème de correction, on obtient $\sim evaluation \,\, (\neg (A \Rightarrow A))$, soit $\sim \sim (implb\,\, A \,\,A)$. On a vu que (\ref{negation}), dans le cadre de SMTCoq, on peut alors obtenir $implb \,\, A \,\, A$.
+En appliquant le théorème de correction, on obtient $\sim interp \,\, (\neg (A \Rightarrow A))$, soit $\sim \sim (implb\,\, A \,\,A)$. On a vu que (\ref{negation}), dans le cadre de SMTCoq, on peut alors obtenir $implb \,\, A \,\, A$.
 
 \subsection{Le préprocesseur}
 
@@ -786,46 +786,46 @@ Inductive AndTree :=
   Bool (_ : bool)
 | And (_ _: AndTree).
 
-Inductive Evaluation : AndTree -> bool -> Prop :=
-  EvalBool b :
-    Evaluation (Bool b) b
-| EvalAnd b1 b2 b3 t1 t2 :
-    Evaluation t1 b1 -> Evaluation t2 b2 -> b1 && b2 = b3 ->
-    Evaluation (And t1 t2) b3.
+Inductive Interpuation : AndTree -> bool -> Prop :=
+  InterpBool b :
+    Interpuation (Bool b) b
+| InterpAnd b1 b2 b3 t1 t2 :
+    Interpuation t1 b1 -> Interpuation t2 b2 -> b1 && b2 = b3 ->
+    Interpuation (And t1 t2) b3.
 
 Definition t :=
   And (And (Bool true) (Bool false)) (And (Bool true) (Bool true)).
 
-Lemma Eval_t_false : Evaluation t false.
+Lemma Interp_t_false : Interpuation t false.
 Proof.
-  eapply EvalAnd ; [
-    eapply EvalAnd ; [ apply EvalBool | apply EvalBool | reflexivity ]
-  | eapply EvalAnd ; [ apply EvalBool | apply EvalBool | reflexivity ]
+  eapply InterpAnd ; [
+    eapply InterpAnd ; [ apply InterpBool | apply InterpBool | reflexivity ]
+  | eapply InterpAnd ; [ apply InterpBool | apply InterpBool | reflexivity ]
   | reflexivity ].
 Qed.
 
-Fixpoint evaluation (t : AndTree) :=
+Fixpoint interp (t : AndTree) :=
   match t with
     Bool n => n
-  | And t1 t2 => evaluation t1 && evaluation t2
+  | And t1 t2 => interp t1 && interp t2
   end.
 
-Proposition Eval_eq_eval t b :
-  Evaluation t b <-> evaluation t = b.
+Proposition Interp_eq_interp t b :
+  Interpuation t b <-> interp t = b.
 Proof.  
   revert b. induction t as [a | t1 IHt1 t2 IHt2]; simpl; intro b.
   -split; intro H.
    +now inversion H.
-   +rewrite H. apply EvalBool.
+   +rewrite H. apply InterpBool.
   -split; intro H.
    +inversion H.
     apply IHt1 in H2; rewrite H2.
     now apply IHt2 in H3; rewrite H3.
-   +eapply EvalAnd. now apply IHt1.
+   +eapply InterpAnd. now apply IHt1.
     now apply IHt2. assumption.
 Qed.
    
-Lemma eval_t_false : evaluation t = false.
+Lemma interp_t_false : interp t = false.
 Proof.
   reflexivity.
 Qed.
@@ -853,7 +853,7 @@ Inductive eqt : AndTree -> AndTree -> Prop :=
 | trans t1 t2 t3: eqt t1 t2 -> eqt t2 t3 -> eqt t1 t3.
 
 Lemma eqt_correct t1 t2:
-  eqt t1 t2 -> evaluation t1 = evaluation t2.
+  eqt t1 t2 -> interp t1 = interp t2.
 Proof.
   intro eq12. induction eq12; simpl.
   -reflexivity.
@@ -882,7 +882,7 @@ Proof.
 Qed.
 
 Lemma peigne_correct t:
-  evaluation (peigne t) = evaluation t.
+  interp (peigne t) = interp t.
 Proof.
   apply eqt_correct. now apply peigne_eqt.
 Qed. 
@@ -898,8 +898,8 @@ Ltac peignify :=
   | [ |- ?A = ?B] =>
     let a := reify A in
     let b := reify B in
-    change A with (evaluation a);
-    change B with (evaluation b);
+    change A with (interp a);
+    change B with (interp b);
     rewrite <- (peigne_correct a);
     rewrite <- (peigne_correct b);
     simpl
