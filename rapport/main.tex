@@ -94,11 +94,11 @@ Université Paris-Sud / CNRS \\}
 
 Les méthodes formelles rassemblent différents logiciels formels qui permettent de formuler des propriétés mathématiques puis de les vérifier. La validité du résultat ne dépend alors que de ce logiciel de vérification. C'est dans ce cadre que G. Gonthier et B. Werner ont prouvé, en Coq, le théorème des quatre couleurs.\medbreak
 
-Les méthodes formelles s'étendent à la preuve de programme: il s'agit alors de vérifier qu'un programme correspond à sa spécification. Cela permet d'augmenter la robustesse et la fiabilité du programme certifié. C'est notamment le cas de Compcert \cite{compcert} qui est un compilateur de code C qui a été certifié en Coq par X. Leroy. L'importance de la correction des logiciels est mise en avant dans le cas des systèmes critiques. En effet, le premier lancement d'Ariane 5 (1996) s'est soldé par un échec dû à un bug logiciel. 
+Les méthodes formelles s'étendent à la preuve de programme: il s'agit alors de vérifier qu'un programme correspond à sa spécification. C'est notamment le cas de Compcert \cite{compcert} qui est un compilateur de code C qui a été certifié en Coq par X. Leroy. La certification d'un programme permet de s'assurer de la robustesse et de la fiabilité de celui-ci. L'importance de la méthode et de la correction des logiciels en général est mise en avant dans le cas des systèmes critiques. En effet, l'échec du premier lancement d'Ariane 5 (1996) est dû à un \textit{bug} logiciel. 
 
 \subsection{Problème étudié}
 
-Parmi ces logiciels formels, on s'intéressera aux assistants de preuves (\ref{assistants}) et aux prouveurs automatiques (\ref{prouveurs}) et plus particulièrement aux interfaces entre un assistant de preuve et différents prouveurs automatiques. De telles interfaces façonnent une preuve à partir du certificat fourni par un des prouveurs automatiques, ce qui améliore l'automatisation de l'assistant de preuve considéré. Cette approche est utilisée par Coqhammer \cite{coqhammer} pour Coq et par Sledgehammer \cite{sledgehammer_manual} pour Isabelle. \medbreak
+Parmi ces logiciels formels, on s'intéressera aux assistants de preuves (\ref{assistants}) et aux prouveurs automatiques (\ref{prouveurs}) et plus particulièrement aux interfaces entre un assistant de preuve et différents prouveurs automatiques. De telles interfaces façonnent une preuve à partir du certificat fourni par un des prouveurs automatiques, dans l'objectif d'améliorer l'automatisation de l'assistant de preuve considéré. Ce fonctionnement est celui de Coqhammer \cite{coqhammer} pour l'assistant de preuve Coq et de Sledgehammer \cite{sledgehammer_manual} pour Isabelle. \medbreak
 
 Pendant mon stage, j'ai travaillé sur SMTCoq \cite{smtcoq_code, these_keller} qui sert aussi d'interface à différents prouveurs automatiques mais qui a la particularité de reproduire fidèlement, en Coq, le certificat reçu. Cette approche permet également de vérifier les certificats fournis par les prouveurs et donc d'augmenter la confiance que l'on a dans ces outils.\medbreak
 
@@ -139,7 +139,7 @@ Dans la suite nous utiliserons Coq comme assistant de preuve. La logique de son 
 
 \subsection{Prouveurs automatiques}\label{prouveurs}
 
-Les prouveurs automatiques, quant à eux, ne demandent pas de preuves de la part de l'utilisateur. L'effort de certification est alors réduit à la formalisation du problème et dans certains cas le prouveur donne une trace de son exécution appelée certificat. En contrepartie, la logique d'un prouveur automatique est plus limitée et/ou la réponse en temps fini n'est pas garantie. Puisque le prouveur automatique doit rechercher la preuve du théorème entré, l'efficacité de l'implantation est capitale. Pour cette raison, les prouveurs automatiques sont écrits dans des langages de plus bas niveau tels que C ou C\texttt{++}. \medbreak
+Les prouveurs automatiques, quant à eux, ne demandent pas de preuves de la part de l'utilisateur. L'effort de certification est alors réduit à la formalisation du problème et dans certains cas le prouveur donne une trace de son exécution appelée certificat. En contrepartie, la logique d'un prouveur automatique est plus limitée et/ou la réponse en temps fini n'est pas garantie. Puisqu'un prouveur automatique doit chercher la preuve du théorème entré, l'efficacité de son implantation est capitale. Pour cette raison, les prouveurs automatiques sont écrits dans des langages de plus bas niveau tels que C ou C\texttt{++} et font usage de structures mutables complexes. \medbreak
 
 La partie \ref{fonctionnement_prouveurs} détaille le fonctionnement des prouveurs automatiques ainsi que l'utilisation que nous en ferons.
 
@@ -149,7 +149,7 @@ La partie \ref{fonctionnement_prouveurs} détaille le fonctionnement des prouveu
 Une interface entre assistant de preuve et prouveurs automatiques telle que SMTCoq offre les avantages des deux types de logiciels formels décrits ci-dessus. Un autre avantage de SMTCoq est sa modularité: il est en effet possible de rajouter d'autres prouveurs automatiques, ceux-ci n'étant pas nécessairement du même type (prouveurs SAT/SMT) et n'ayant pas nécessairement le même format d'entrée ni le même format de sortie. \medbreak
 
 
-La partie \ref{pres_smtcoq} présente SMTCoq qui est l'objet du stage et qui est un projet actuellement développé par Chantal Keller en collaboration avec l'Université de l'Iowa. \medbreak
+La partie \ref{pres_smtcoq} présente SMTCoq qui est l'objet du stage et qui est un projet actuellement développé par Chantal Keller en collaboration avec l'Université de l'Iowa. Les fichiers source de SMTCoq sont écrits en OCaml et en Coq qui sont aussi les langages utilisés pendant le stage. \medbreak
 
 Les fragments de code Coq fournis sont encadrés et sont compilables lorsqu'ils sont chargés dans l'environnement de SMTCoq. Il faut donc les préfacer par
 \begin{lstlisting}[frame=single]
