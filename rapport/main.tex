@@ -534,7 +534,7 @@ On appellera \textit{ccertif} la liste de toutes les \textit{crule} du certifica
 
 \subsubsection{La fonction récursive \texttt{checker}} \label{checker}
 
-Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état. On rappelle qu'une clause représente la disjonction d'une liste de formules et est notée  entre parenthèses. La fonction \texttt{checker} implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisément, \texttt{checker} est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui a aussi un paramètre état. Le résultat des \textit{crule} suit le fonctionnement des $trule$. Par exemple le résultat de \texttt{ImmBuildProj 0 1} est $(X)$ si le premier emplacement du tableau d'état est de la forme $(\neg (X \Rightarrow Y))$. À chaque appel de \texttt{checker}, une nouvelle \textit{crule} est consommée, son résultat est utilisé pour modifier l'emplacement courant du tableau d'état.\medbreak
+Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état, le premier emplacement ayant pour indice \texttt{1}. On rappelle qu'une clause représente la disjonction d'une liste de formules et est notée  entre parenthèses. La fonction \texttt{checker} implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisément, \texttt{checker} est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui a aussi un paramètre état. Le résultat des \textit{crule} suit le fonctionnement des $trule$. Par exemple le résultat de \texttt{ImmBuildProj 0 1} est $(X)$ si le premier emplacement du tableau d'état est de la forme $(\neg (X \Rightarrow Y))$. À chaque appel de \texttt{checker}, une nouvelle \textit{crule} est consommée, son résultat est utilisé pour modifier l'emplacement courant du tableau d'état.\medbreak
 
 Il n'y a pas de \textit{crule} correspondant à la règle $input$. À la place, le tableau d'état est initialisé avec le résultat de la règle $input$. Ce fonctionnement n'est possible que lorsqu'il n'y a qu'une seule règle $input$, ce qui est le cas de la tactique \texttt{verit} (la valeur d'initialisation est la négation du but). La taille du tableau est égale au nombre de règles du \textit{tcertif}.\medbreak
 
@@ -711,9 +711,9 @@ Il faut donc remettre le but dans une forme qui correspond à celle du lemme. Da
 
 \subsubsection{Différence liée à la symétrie de l'égalité}
 
-Les lemmes qui apparaissent dans les certificats de veriT peuvent avoir subi des modifications (\ref{lien_formule_lemme}), ces modifications se retrouvent dans les règles d'instanciation des lemmes. À partir du lemme Coq \texttt{forall x, f x =? f c} où \texttt{c} est une constante entière, le certificat de veriT peut contenir la règle:
+Les lemmes qui apparaissent dans les certificats de veriT peuvent avoir subi des modifications (\ref{lien_formule_lemme}), ces modifications se retrouvent dans les preuves d'instanciation des lemmes. À partir du lemme Coq \texttt{forall\,x, f x =?\,\,\,f c} où \texttt{c} est une constante entière, le certificat de veriT peut contenir la règle:
 \[id1: (input \,\,(\forall\,\, x, \,\,f \,\,c = f \,\,x))\]
-Une règle instance correspondant à ce lemme peut donc être: 
+Une règle d'instanciation correspondant à ce lemme peut donc être: 
 \[id2:(forall\_inst\,\, (\neg (\forall \,\,x,\,\, f\,\, c = f \,\,x) \,\, (f\,\, c = f\,\, 3)))\]
 On a vu qu'on peut reconnaître que cette instance correspond au lemme donné par l'utilisateur (\ref{lien}). On est donc ramené au problème \texttt{instance\_3}. Pour résoudre ce problème, on commence par remarquer que la plupart du temps, si une des égalités est inversée, alors toutes les égalités sont inversées. On écrit une tactique qui inverse toutes les égalités et pour chaque cas on essaye de résoudre le but en utilisant cette tactique et en ne l'utilisant pas.
 
@@ -742,7 +742,7 @@ Hint Resolve impl_split.
 
 On définit une nouvelle tactique : \texttt{verit\_base}. Cette tactique peut prendre en argument des preuves de lemmes à rajouter. Par exemple 
 \begin{lstlisting}[frame=single]
-Lemma fSS3 f k:
+Lemma instance_double f k:
   (forall x, f (x + 1) =? f x + k) ->
   forall x, f (x + 2) =? f x + 2 * k.
 Proof. intro f_k_linear. verit_base f_k_linear.
@@ -764,7 +764,7 @@ Ce stage s'inscrit dans une approche automatique de la démonstration dans un as
 D'autres outils sont disponibles dans ce cadre, à commencer par Coqhammer \cite{coqhammer} qui est aussi un \textit{plugin} pour Coq qui utilise des prouveurs automatiques. À la différence de SMTCoq, lors de la reconstruction de la preuve, Coqhammer liste les lemmes qui apparaissent dans le certificat et n'utilise rien d'autre que cette liste du certificat. Ainsi, il y a une recherche qui est faite par des tactiques en Coq et qui permet de retrouver la preuve. Cette méthode est plus robuste que celle  de SMTCoq vis-à-vis des prouveurs automatiques mais demande de chercher à nouveau la preuve et est donc plus coûteuse. De la même manière, pour trouver les preuves d'instanciation (\ref{preuve_instanciation}), la recherche a été faite en Coq. Cette méthode s'est avérée utile pour passer outre certaines différences entre instances et lemmes. Un autre point de divergence est que SMTCoq propose aussi une commande de vérification, ce qui permet d'améliorer la confiance accordée aux prouveurs automatiques (\ref{confiance}).
 
 
-Un autre outil qui a une interface sceptique avec des prouveurs automatiques est Sledgehammer \cite{sledgehammer_manual} qui est  développé pour l'assistant de preuve Isabelle. L'idée d'un sélectionneur de lemmes qui apprend quels lemmes il est judicieux d'envoyer aux prouveurs automatiques \cite{hol_selector} vient de Sledgehammer.
+Toujours dans l'approche sceptique, Sledgehammer \cite{sledgehammer_manual} est une interface avec des prouveurs automatiques qui est développée pour l'assistant de preuve Isabelle. L'idée d'un sélectionneur de lemmes qui apprend quels lemmes il est judicieux d'envoyer aux prouveurs automatiques \cite{hol_selector} vient de \text{Sledgehammer}.
 
 On peut aussi mentionner des approches autarciques de la démonstration automatique comme la tactique \texttt{unsat} \cite{smt_autarcique} qui utilise la réflexion calculatoire ou encore la tactique \texttt{metis} en Isabelle. \medbreak
 
