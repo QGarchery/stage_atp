@@ -799,9 +799,9 @@ En résumé, ce stage a permis d'améliorer l'expressivité de SMTCoq tout en re
 
 
 
-\section*{Annexe A: Formules booléennes conjonctives}
+\section*{Annexe A: Formules booléennes disjonctives}
 
-On donne ici deux définitions, la preuve de leur équivalence, la mise en forme de peigne des formules conjonctives, la correction de cette fonction, la réification d'un booléen et une tactique qui utilise la réflexion calculatoire.
+Le fichier Coq \texttt{ortree.v} à la racine du répertoire SMTCoq contient:
 
 \begin{lstlisting}[frame=single]
 Require Import Bool.
@@ -941,7 +941,9 @@ Qed.
 
 \lstset{language=Java}
 
-Lorsqu'on appelle veriT sur le fichier SMT-LIB \texttt{simple\_instance.smt2} suivant: 
+Dans le répertoire \texttt{unit-tests} de SMTCoq, la commande 
+\[\texttt{./runverit.sh instance2.smt2} \]
+appelle veriT sur le fichier SMT-LIB \texttt{instance2.smt2} suivant:  
 \begin{lstlisting}[frame=no]
 (set-logic UFLIA)
 (declare-fun f (Int) Int)
@@ -951,7 +953,7 @@ Lorsqu'on appelle veriT sur le fichier SMT-LIB \texttt{simple\_instance.smt2} su
 (exit)
 \end{lstlisting}
 
-on obtient $unsat$ et la preuve dans un fichier contenant: 
+On obtient $unsat$ et le fichier de certificat \texttt{instance2.vtlog} contenant: 
 
 \begin{lstlisting}[frame=no]
 1:(input ((not #1:(= #2:(f 3) #3:(+ #4:(f 2) 7)))))
@@ -976,11 +978,9 @@ on obtient $unsat$ et la preuve dans un fichier contenant:
 
 
 \section*{Annexe C: Automatisation des preuves d'instanciation}
+Dans le fichier Coq \texttt{src/SMTCoq.v}, on écrit:
 \lstset{language=coq}
 \begin{lstlisting}[frame=single]
-Require Import SMTCoq Bool.
-Open Scope Z_scope.
-
 (* verit silently transforms an <implb a b> into a <or (not a) b> when
  instantiating a quantified theorem with <implb> *)
 Lemma impl_split a b:
