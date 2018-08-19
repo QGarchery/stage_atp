@@ -155,7 +155,7 @@ Les fragments de code Coq fournis sont encadrés et sont compilables lorsqu'ils 
   Require Import SMTCoq Bool.
   Open Scope Z_scope.
 \end{lstlisting}
-Cela requiert l'installation de SMTCoq, disponible à l'adresse
+Cela requiert l'installation de SMTCoq, la version contenant ma contribution est disponible à l'adresse:
 \begin{align*}
     \texttt{https://github.com/QGarchery/smtcoq-1}
 \end{align*}
@@ -757,7 +757,7 @@ Plus généralement, lorsqu'on veut rajouter les lemmes prouvés par \texttt{H1}
 
 On définit la tactique \texttt{verit} comme \texttt{verit\_base; vauto} ce qui nous permet de conserver le comportement de cette tactique par rapport à la version antérieure de SMTCoq lorsque l'on n'utilise pas de lemmes supplémentaires. On définit également une liste qui sera toujours ajoutée à \texttt{verit\_base}. Initialement cette liste est vide mais la commande \texttt{Add\_lemmas H1\,...\,Hn} la concatène avec \texttt{H1}, ...,\texttt{Hn}. Pour finir la commande \texttt{Clear\_lemmas} réinitialise la liste. 
 
-Le dépôt Git \texttt{github.com/QGarchery/smtcoq-1} contient d'autres exemples donnés dans les fichiers $Example.v$ et $Tests\_verit.v$.
+Le dépôt Git \texttt{github.com/QGarchery/smtcoq-1} contient d'autres exemples donnés dans les fichiers \texttt{examples/Example.v} et \texttt{unit-tests/Tests\_verit.v}.
 
 
 \section{Travaux connexes et conclusion}
@@ -941,7 +941,7 @@ Qed.
 
 \lstset{language=Java}
 
-Lorsqu'on appelle veriT sur le fichier SMT-LIB $simple\_instance.smt2$ suivant: 
+Lorsqu'on appelle veriT sur le fichier SMT-LIB \texttt{simple\_instance.smt2} suivant: 
 \begin{lstlisting}[frame=no]
 (set-logic UFLIA)
 (declare-fun f (Int) Int)
