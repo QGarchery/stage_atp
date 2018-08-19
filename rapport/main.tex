@@ -423,6 +423,7 @@ Chacune des tactiques Coq définies par SMTCoq invoque un prouveur automatique d
 
 
 
+
 Les prouveurs automatiques fournissent un certificat uniquement dans le cas où le problème n'est pas satisfiable (\ref{sortie}). Pour exploiter ce fonctionnement, SMTCoq envoie la négation du but au prouveur automatique. La preuve ne peut être reconstruite que dans le cas où la réponse est $unsat$ et est accompagnée d'un fichier de certificat. Ce fichier prouve que la négation du but mène à l'absurde. Autrement dit, on obtient une preuve de la double négation du but. Afin de pouvoir en déduire le but, SMTCoq requiert des formules exprimées dans les booléens. En effet, le type des booléens supporte la logique classique alors que le type des propositions de Coq est intuitionniste. 
 
 \begin{center}
@@ -509,6 +510,7 @@ La transformation de Tseitin d'une formule donne une formule équisatisfiable qu
 
 La transformation commence par nommer toutes les sous-formules en partant des feuilles. La nouvelle formule à satisfaire est alors la conjonction de la variable représentant toute la formule et de formules additionnelles qui garantissent que les nouvelles variables sont équivalentes aux sous-formules qu'elles représentent. \medbreak
 
+
 On reprend l'exemple de la partie \ref{fonctionnement_prouveurs}. En nommant les atomes on avait obtenu la formule $((a \wedge b) \vee c) \wedge d$. On introduit également $e$ pour la sous-formule $a \wedge b$, $f$ pour la sous-formule $e \vee c$ et $g$ pour la sous-formule $f \wedge d$ qui est en fait toute la formule. La formule transformée devient donc $g \wedge D_e \wedge D_f \wedge D_g$ où les $D_\alpha$ sont des formules qui nous assurent que la variable $\alpha$ est équivalente à la formule qu'elle représente. On a par exemple $D_e = (\neg a \vee \neg b \vee e) \wedge (\neg e \vee a) \wedge (\neg e \wedge b)$ qui nous assure que la variable $e$ est équivalente à $a \wedge b$. \medbreak
 
 Dans SMTCoq, au lieu de rajouter les formules $D_\alpha$, les sous-formules sont enregistrées dans un tableau: la variable $e$ est un indice du tableau et le tableau contient à l'indice $e$ la formule représentée par $e$ ($a \wedge b$ dans notre exemple).
@@ -521,12 +523,14 @@ Le vérificateur de SMTCoq contient un type inductif \textit{crule} qui représe
 \subsubsection{Le type inductif \textit{crule}}\label{regroupement}
 
 
+
 Chaque constructeur du type inductif \textit{crule} représente une famille de  \textit{trule}. Le constructeur \texttt{Res} ne représente que la règle $resolution$ mais d'autres constructeurs peuvent représenter différentes règles en fonction de leurs paramètres. Par exemple, le constructeur \texttt{ImmBuildProj} regroupe les règles $not\_implies0$ et $not\_implies1$ (\ref{not_implies}) et contient aussi un paramètre entier qui vaut \texttt{0} ou \texttt{1} et qui indique quelle est la \textit{trule} représentée. Ce regroupement de règles au fonctionnement similaire permet, dans la suite, de simplifier le traitement de ces règles. \medbreak
 
 On appellera \textit{ccertif} le type des certificats en Coq représentés par des listes de \textit{crule}.
 
 
 \subsubsection{La fonction récursive \texttt{checker}} \label{checker}
+
 
 Pour enregistrer le résultat des règles précédentes on utilise un tableau de clauses appelé état, le premier emplacement ayant pour indice \texttt{1}. On rappelle qu'une clause représente la disjonction d'une liste de formules et est notée  entre parenthèses. La fonction \texttt{checker} implémente l'application des règles du certificat et modifie donc l'état à chaque nouvelle \textit{crule} rencontrée. Plus précisément, \texttt{checker} est une fonction Coq qui est définie récursivement sur son paramètre de type \textit{ccertif} et qui a aussi un paramètre état. Le résultat des \textit{crule} suit le fonctionnement des $trule$. Par exemple le résultat de \texttt{ImmBuildProj 0 1} est $(X)$ si le premier emplacement du tableau d'état est de la forme $(\neg (X \Rightarrow Y))$. À chaque appel de \texttt{checker}, une nouvelle \textit{crule} est consommée, son résultat est enregistré dans l'état.\medbreak
 
@@ -706,6 +710,7 @@ Lemma instance_3 f (c : Z):
 Il faut donc remettre le but dans une forme qui correspond à celle du lemme. Dans le cas ci-dessus il faut utiliser la symétrie de l'égalité avant d'appliquer la tactique \texttt{auto}.
 
 \subsubsection{Différence liée à la symétrie de l'égalité}
+
 
 Les lemmes qui apparaissent dans les certificats de veriT peuvent avoir subi des modifications (\ref{lien_formule_lemme}), ces modifications se retrouvent dans les preuves d'instanciation des lemmes. Par exemple, à partir du lemme Coq \texttt{forall\,x, f x =?\,\,\,f c} où \texttt{c} est une constante entière, le certificat de veriT peut contenir la règle:
 \[id1: (input \,\,(\forall\,\, x, \,\,f \,\,c = f \,\,x))\]
