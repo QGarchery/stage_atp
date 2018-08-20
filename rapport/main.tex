@@ -110,7 +110,7 @@ Pendant mon stage, je me suis donc attaché à améliorer l'expressivité de SMT
 
 \subsection{Arguments en faveur de la validité de la contribution}
 
-En plus des tests présents dans SMTCoq initialement, le code final passe d'autres tests qui requièrent la transmission de lemmes au prouveur automatique. Cela atteste  que l'implémentation de la méthode est valide et induit un gain d'expressivité. J'ai ainsi pu vérifier des propriétés, automatiquement et dans Coq, portant sur: la théorie des groupes, une théorie formalisant les listes d'entiers, des fonctions définies récursivement, etc.
+En plus des tests présents dans SMTCoq initialement, le code final passe d'autres tests qui requièrent la transmission de lemmes au prouveur automatique. Cela atteste  que l'implémentation de la méthode est valide et que celle-ci induit un gain d'expressivité. J'ai ainsi pu vérifier des propriétés, automatiquement et dans Coq, portant sur: la théorie des groupes, une théorie formalisant les listes d'entiers, des fonctions définies récursivement, etc.
 
 D'autre part, ma contribution respecte le principe sceptique de SMTCoq (\ref{sceptique_autarcique}): le développement et le calcul sont faits principalement en OCaml, en dehors de l'assistant de preuve. Cet aspect donne une meilleure robustesse à SMTCoq face aux changements internes des prouveurs automatiques.
 
@@ -542,7 +542,7 @@ Lorsque toute la liste \textit{ccertif} a été consommée, \texttt{checker} ren
 
 \subsubsection{Théorème de correction}
 
-Sur le type des formules, SMTCoq définit une fonction \texttt{interp} qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} \texttt{cc} et toute clause \texttt{cl}, si le tableau d'état \texttt{t} est initialisé avec \texttt{cl},  alors: 
+Sur le type des clauses, SMTCoq définit une fonction \texttt{interp} qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} \texttt{cc} et toute clause \texttt{cl}, si le tableau d'état \texttt{t} est initialisé avec \texttt{cl},  alors: 
 \[ \texttt{checker cc t = true -> negb (interp cl)} \]
  Une fois celui-ci démontré, la preuve du but initial est obtenue en appliquant le théorème de correction puis la réflexivité de l'égalité. En effet, si \texttt{checker cc t} est convertible à \texttt{true}, alors l'hypothèse \texttt{checker cc t = true} est convertible à \texttt{true = true}.
 
