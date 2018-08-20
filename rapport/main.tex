@@ -195,7 +195,7 @@ Inductive Interp : OrTree -> Prop :=
     Interp t2 -> Interp (Or t1 t2).
 \end{lstlisting}
 
-Ce type inductif est tel que \texttt{Interp t} signifie que l'interprétation de  \texttt{t} est vraie. Le cas des feuilles \texttt{true} est traité par \texttt{InterBool}. Le constructeur \texttt{InterpOrLeft} nous assure que si l'interprétation de \texttt{t1} est vraie alors, pour tout arbre \texttt{t2}, l'interprétation de \texttt{Or t1 t2} est vraie. Le cas \texttt{InterpOrRight} est similaire.\medbreak
+Pour tout arbre \texttt{t}, \texttt{Interp t} signifie que l'interprétation de  \texttt{t} est vraie. Le cas des feuilles \texttt{true} est traité par \texttt{InterpBool}. Le constructeur \texttt{InterpOrLeft} nous assure que si l'interprétation de \texttt{t1} est vraie alors, pour tout arbre \texttt{t2}, l'interprétation de \texttt{Or t1 t2} est vraie. Le cas \texttt{InterpOrRight} est similaire.\medbreak
 
 On peut alors faire des preuves sur les éléments de ce type inductif: 
 \begin{lstlisting}[frame=single]
@@ -275,8 +275,8 @@ Le méta-langage des tactiques de Coq, langage non typé, non terminant et impl�
 \begin{lstlisting}[frame=single]
 Ltac reify A :=  match A with
   | orb ?X ?Y => let rx := reify X in
-                    let ry := reify Y in
-                    constr:(Or rx ry)
+                   let ry := reify Y in
+                   constr:(Or rx ry)
   | ?X => constr:(Bool X) end.
 
 \end{lstlisting}
@@ -293,7 +293,7 @@ L'intérêt de la réification est que la structure du terme réifié est mise e
 
 Par exemple, sur le type \texttt{OrTree}, il est possible de définir une fonction \texttt{peigne} qui renvoie l'arbre en argument mis sous forme de peigne. Le théorème de correction de cette fonction établit que
 \[ \texttt{forall t\,:\,OrTree, interp (peigne t) = interp t} \]
-Ce théorème de correction n'est applicable que si on a un terme de la forme \texttt{interp x}. Si \texttt{u} est un terme booléen dont la réification est \texttt{v} (de type \texttt{OrTree}), on peut mettre \texttt{u} sous cette forme en remarquant que $\texttt{interp v}\equiv\texttt{u}$. \medbreak
+Ce théorème de correction n'est applicable que si on a un terme de la forme \texttt{interp x}. Si \texttt{u} est un terme booléen dont la réification est \texttt{v} (de type \texttt{OrTree}), on peut mettre \texttt{u} sous cette forme en remarquant que $\texttt{interp v}\,\equiv\,\texttt{u}$. \medbreak
 
 En combinant tous ces résultats, on peut définir une tactique \texttt{peignify} qui met en forme de peigne les formules disjonctives des deux côtés de l'égalité. Cette tactique permet par exemple de démontrer le lemme suivant: 
 \begin{lstlisting}[frame=single]
@@ -382,7 +382,7 @@ Pour manipuler ces clauses, veriT peut utiliser une règle $resolution$. La règ
 \end{align*}
 
 Une règle de résolution peut avoir plus de deux dépendances. Son résultat est alors défini récursivement à partir de ceux des règles de résolution appliquées à deux clauses. Par exemple, le résultat de la règle \[4:(resolution \,\,(B) \,\,1\,\, 2\,\,3) \]
-est le même que celui de la règle $5$ lorsque la règle ci-desus est remplacée par les règles
+est le même que celui de la règle $5$ lorsque la règle ci-dessus est remplacée par les règles
 \begin{align*}
 4&:(resolution \,\,(A) \,\,1\,\, 2) \\
 5&:(resolution \,\,(B) \,\,4\,\, 3) 
@@ -542,15 +542,15 @@ Lorsque toute la liste \textit{ccertif} a été consommée, \texttt{checker} ren
 
 \subsubsection{Théorème de correction}
 
-Sur le type des formules, SMTCoq définit une fonction \texttt{interp} qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} \texttt{cc} et toute formule \texttt{f}, si le tableau d'état \texttt{t} est initialisé comme décrit précédemment,  alors: 
-\[ \texttt{checker cc t = true -> negb (interp f)} \]
+Sur le type des formules, SMTCoq définit une fonction \texttt{interp} qui inverse la réification (\ref{interet_reification}). Le vérificateur repose sur le théorème de correction qui nous assure que pour tout \textit{ccertif} \texttt{cc} et toute clause \texttt{cl}, si le tableau d'état \texttt{t} est initialisé avec \texttt{cl},  alors: 
+\[ \texttt{checker cc t = true -> negb (interp cl)} \]
  Une fois celui-ci démontré, la preuve du but initial est obtenue en appliquant le théorème de correction puis la réflexivité de l'égalité. En effet, si \texttt{checker cc t} est convertible à \texttt{true}, alors l'hypothèse \texttt{checker cc t = true} est convertible à \texttt{true = true}.
 
 \subsubsection{Preuve du théorème de correction} \label{preuve_correction}
 
-On dit qu'une clause est valide lorsque son interprétation est prouvable. La preuve du théorème de correction utilise la proposition \texttt{step\_checker\_correct} qui s'énonce ainsi: si toutes les clauses du tableau d'état sont valides alors une étape de \texttt{checker} modifie ce tableau en un tableau dont toutes les clauses sont valides. Il suffit en fait de vérifier que la nouvelle clause générée par \texttt{checker} est valide. \medbreak
+On dit qu'une clause est valide lorsque son interprétation est vraie. La preuve du théorème de correction utilise la proposition \texttt{step\_checker\_correct} qui s'énonce ainsi: si toutes les clauses du tableau d'état sont valides alors une étape de \texttt{checker} modifie ce tableau en un tableau dont toutes les clauses sont valides. Il suffit en fait de vérifier que la nouvelle clause générée par \texttt{checker} est valide. \medbreak
 
-À partir de cette proposition on obtient une preuve du théorème de correction. Donnons les grandes étapes de la preuve de ce théorème. Pour prouver $\texttt{checker cc t = true -> negb (interp f)}$, on suppose \texttt{interp f} et \texttt{checker cc t = true}. Initialement, l'état ne contient donc que des clauses valides (tous les emplacements du tableau contiennent \texttt{f}). D'après \texttt{step\_checker\_correct}, cette propriété est conservée par la fonction \texttt{checker}. Si de plus \texttt{checker} renvoie \texttt{true} cela veut dire qu'il y a la clause vide dans le dernier tableau d'état. L'interprétation de la clause vide nous conduit à une contradiction.
+À partir de cette proposition on démontre le théorème de correction. Donnons les grandes étapes de la preuve de ce théorème. Pour prouver $\texttt{checker cc t = true -> negb (interp cl)}$, on suppose \texttt{interp cl} et \texttt{checker cc t = true}. Initialement, l'état ne contient donc que des clauses valides (tous les emplacements du tableau contiennent \texttt{cl}). D'après \texttt{step\_checker\_correct}, cette propriété est conservée par la fonction \texttt{checker}. Si de plus \texttt{checker} renvoie \texttt{true} cela veut dire qu'il y a la clause vide dans le dernier tableau d'état. L'interprétation de la clause vide nous conduit à une contradiction.
 
 
 \subsubsection{Exemple de l'identité} \label{id_exemple}
@@ -572,7 +572,7 @@ Le calcul de \texttt{checker} est alors:
     &\equiv \,\, \texttt{checker [] [|nid; }(A)\texttt{; }(\neg A)\texttt{; }()\texttt{|]} \\
     &\equiv \,\, \texttt{true}
 \end{align*}
-En appliquant le théorème de correction, on obtient \texttt{negb (interp (}$\neg (A \Rightarrow A)$\texttt{))} qui est convertible à \texttt{negb (negb (implb A A))}. Cette proposition est bien équivalente à \texttt{implb A A}.
+En appliquant le théorème de correction, on obtient \texttt{negb (interp }$(\neg (A \Rightarrow A))$\texttt{)} qui est convertible à \texttt{negb (negb (implb A A))}. Cette proposition est bien équivalente à \texttt{implb A A}.
 
 \subsection{Le préprocesseur}
 
@@ -584,7 +584,7 @@ La transformation des certificats passe par une étape intermédiaire (\ref{des_
 
 \subsubsection{Allocation dans le tableau d'état} \label{alloc}
 
-On remarque que dans l'exemple de l'identité (\ref{id_exemple}), le tableau d'état n'a pas besoin d'être de taille 4: 2 emplacements suffisent pour ce certificat. De manière générale, on peut réduire l'espace mémoire utilisé en calculant le nombre maximal de clauses à retenir à chaque étape de \texttt{checker}, c'est ce que fait la fonction $alloc$. Cette fonction assigne aussi, pour chaque règle, un emplacement dans l'état où enregistrer son résultat. Ce paramètre de position est noté au début des \textit{crule}, de sorte que lorsque \texttt{checker} rencontre \texttt{ImmBuildProj 1 0 2}, le premier emplacement de l'état est modifié en $(X)$ si le deuxième emplacement de l'état contient $\neg(X \Rightarrow Y)$. Puisque les emplacements des clauses sont modifiés, il faut aussi modifier les dépendances des règles. Enfin, \texttt{checker} prend un paramètre qui indique quelle est la position du résultat de la dernière règle, celui-ci n'étant pas nécessairement au dernier emplacement de l'état comme précédemment. En initialisant \texttt{t} à \texttt{[|nid; nid|]} et en posant \texttt{cc := [ImmBuildProj 1 0 2; ImmBuildProj 2 1 2; Res 1 1 2]}, on a :
+On remarque que dans l'exemple de l'identité (\ref{id_exemple}), le tableau d'état n'a pas besoin d'être de taille~4: seulement 2 emplacements sont nécessaires pour ce certificat. De manière générale, on peut réduire l'espace mémoire utilisé en calculant le nombre maximal de clauses à retenir à chaque étape de \texttt{checker}, c'est ce que fait la fonction $alloc$. Cette fonction assigne aussi, pour chaque règle, un emplacement dans l'état où enregistrer son résultat. Ce paramètre de position est noté au début des \textit{crule}, de sorte que lorsque \texttt{checker} rencontre \texttt{ImmBuildProj 1 0 2}, le premier emplacement de l'état est modifié en~$(X)$ si le deuxième emplacement de l'état contient $(\neg(X \Rightarrow Y))$. Puisque les emplacements des clauses sont modifiés, il faut aussi modifier les dépendances des règles. Enfin, \texttt{checker} prend un paramètre qui indique quelle est la position du résultat de la dernière règle, celui-ci n'étant pas nécessairement au dernier emplacement de l'état comme précédemment. En initialisant \texttt{t} à \texttt{[|nid; nid|]} et en posant \texttt{cc := [ImmBuildProj 1 0 2; ImmBuildProj 2 1 2; Res 1 1 2]}, on a :
 \begin{align*}
   \texttt{checker cc t 1} \,\,&\equiv \,\, \texttt{checker [ImmBuildProj 2 1 2; Res 1 1 2] [|}(A)\texttt{; nid|] 1} \\
     &\equiv \,\,\texttt{checker [Res 1 1 2] [|}(A)\texttt{; }(\neg A)\texttt{|] 1} \\
@@ -626,7 +626,7 @@ Le \textit{hash consing} des formules apparaissant dans le certificat (\ref{tsei
 
 \subsubsection{Lien entre une règle $forall\_inst$ et une règle $input$} \label{lien_parsing}
 
-Dans l'exemple, la dépendance de la règle $forall\_inst$ au lemme donné dans la règle $input$ est évidente pour plusieurs raisons: le certificat est de petite taille, il y a égalité syntaxique entre le lemme et une sous-formule du résultat de la règle $forall\_inst$, la règle de résolution qui utilise la règle $forall\_inst$ est située juste après celle-ci et a exactement 2 dépendances. Cependant, dans le cas général, aucune de ces raisons ne reste valide. En particulier, veriT fait un renommage des variables liées qui apparaissent dans les lemmes (le certificat complet est donnée dans l'annexe B). Retrouver la dépendance demande donc, a priori, d'unifier à $\alpha$-équivalence près des formules contenues dans une règle $forall\_inst$ et dans les règles $input$. Heureusement, veriT fait un \textit{hash consing} des formules qui apparaissent dans les \textit{tcertif}. Cela nous permet d'enregistrer la dépendance au lemme dans la règle $forall\_inst$ au moment du \textit{parsing} des certificats de veriT. La règle $2$ devient: 
+Dans l'exemple, la dépendance de la règle $forall\_inst$ au lemme donné dans la règle $input$ est évidente pour plusieurs raisons: le certificat est de petite taille, il y a égalité syntaxique entre le lemme et une sous-formule du résultat de la règle $forall\_inst$, la règle de résolution qui utilise la règle $forall\_inst$ est située juste après celle-ci et a exactement 2 dépendances. Cependant, dans le cas général, aucune de ces raisons ne reste valide. En particulier, veriT fait un renommage des variables liées qui apparaissent dans les lemmes (le certificat complet est donnée dans l'annexe B). Retrouver la dépendance demande donc, a priori, d'unifier à $\alpha$-équivalence près des formules contenues dans une règle $forall\_inst$ et dans les règles $input$. Heureusement, veriT fait un \textit{hash consing} des formules qui apparaissent dans les \textit{tcertif}. Cela nous permet d'enregistrer la dépendance au lemme dans la règle $forall\_inst$ au moment du \textit{parsing} des certificats de veriT. La règle $3$ devient: 
 \begin{align*}
 3:(forall\_inst \,\, (\neg(\forall \,\,x, \,\,f \,\,(x+1) = f\,\,x+7) \,\,(f\,\, (2+1) = f\,\,2+7)) \,\,2) 
 \end{align*}
@@ -644,7 +644,7 @@ On a vu que veriT utilise des règles d'intanciation des lemmes dont les résult
 La traduction directe de ces règles pose plusieurs problèmes listés ci-dessous. 
 \begin{enumerate}
 \item La clause ci-dessus est une tautologie pour tout prédicat $P$ et toute valeur $n$ en logique classique. Cependant, dans la logique intuitionniste de Coq, ce n'est plus vrai. 
-\item Initialement, seulement la règle $input$ correspondant au but était prise en compte (\ref{checker}) mais on a vu que l'utilisation d'une règle d'instanciation dépend indirectement d'une règle $input$ (\ref{forall_inst}). Il faut donc créer une nouvelle \textit{crule} pour représenter les règles $input$ correspondant aux lemmes rajoutés par l'utilisateur.
+\item Initialement, seulement la règle $input$ correspondant au but était prise en compte en initialisant l'état avec son résultat (\ref{checker}) mais on a vu que l'utilisation d'une règle d'instanciation dépend indirectement d'une règle $input$ (\ref{forall_inst}). Il faut donc créer une nouvelle \textit{crule} pour représenter les règles $input$ correspondant aux lemmes rajoutés par l'utilisateur.
 \item Il faut modifier le format des \textit{crule} pour accepter les formules quantifiées, ce qui demande ensuite de raisonner dans Coq sur des termes à $\alpha$-équivalence près.
 \end{enumerate}
 Une solution au problème (1) serait de remplacer les résultats des règles d'instanciation par des clauses de la forme
@@ -661,8 +661,9 @@ où $lemma$ est un des lemmes rajoutés par l'utilisateur et $lemma\_inst$ est u
 
 Cette modification résout le problème (1) et le problème (3), la forme proposée ci-dessus ne faisant apparaître ni la forme logique de l'implication ni le lemme quantifié. Il faut aussi modifier les règles suivantes qui dépendent du résultat de cette nouvelle règle. On fait l'hypothèse supplémentaire qu'une règle $forall\_inst$ dépendant d'un lemme $l$ ne sera utilisée dans la suite du certificat que dans une règle de résolution ayant aussi une dépendance à $l$. On se ramène donc à modifier seulement les règles de résolution, ce que l'on fait ainsi: si une règle de résolution a pour liste de dépendances $dep$, on trouve toutes les règles $forall\_inst$ de cette liste et on enlève leurs dépendances de $dep$. Cette modification a une complexité en pire cas linéaire dans la taille des certificats. Dans le cas où il ne reste plus qu'une seule dépendance, la règle $resolution$ devient une règle $same$, c'est-à-dire une règle qui a le même résultat qu'une règle précédente. \medbreak
 
-Par exemple, dans le certificat de l'exemple de cette partie, la règle $3$ a pour dépendance la règle $2$. La liste de dépendances de la règle de résolution contient l'identifiant $3$ qui est une règle $forall\_inst$, il faut donc enlever la règle $2$ de cette liste. La nouvelle liste de dépendances de la règle de résolution étant réduite à un seul élément, cette règle devient une règle $same$:
+Par exemple, dans le certificat de l'exemple de cette partie (\ref{forall_inst}), la règle $3$ a pour dépendance la règle~$2$. La liste de dépendances de la règle de résolution contient l'identifiant $3$ qui est une règle $forall\_inst$, il faut donc enlever la règle $2$ de cette liste. La nouvelle liste de dépendances de la règle de résolution étant réduite à un seul élément, cette règle devient une règle $same$. Les règles $3$ et $4$ du certificat deviennent donc:
 \begin{align*}
+3&:(forall\_inst \,\, (f\,\, (2+1) = f\,\,2+7) \,\,2) \\
 4&:(same  \,\, (f \,\,(2+1) = f\,\,2+7) \,\,3) 
 \end{align*}
 
@@ -682,7 +683,7 @@ Dans cette section, on se propose d'encoder les règles d'instanciation en ne ra
 
 Le nouveau constructeur s'écrit:
 \[\texttt{Forallinst p lemma plemma lemma\_inst pinstanc}\]
-où \texttt{p} est le para\-mètre de position (\ref{alloc}), \texttt{lemma} est le lemme dont on a identifié la dépendance (\ref{lien}), \texttt{plemma} est la preuve de ce lemme, \texttt{lemma\_inst} est l'instance et \texttt{pinstanc} est un élément du type \texttt{lemma -> interp lemma\_inst}, c'est-à-dire une preuve que le lemme implique l'instance. Le problème (2) de la partie précédente est donc résolu: le lemme est directement transmis à la règle \texttt{Forallinst}. \medbreak
+où \texttt{p} est le para\-mètre de position (\ref{alloc}), \texttt{lemma} est le lemme dont on a identifié la dépendance~(\ref{lien}), \texttt{plemma} est la preuve de ce lemme, \texttt{lemma\_inst} est l'instance et \texttt{pinstanc} est un élément du type \texttt{lemma~->~interp lemma\_inst}, c'est-à-dire une preuve que le lemme implique l'instance. Le pro\-blème~(2) de la partie précédente est donc résolu: le lemme est directement transmis à la règle \texttt{Forallinst}. \medbreak
 
 Une étape de la fonction \texttt{checker} correspondant à une telle \textit{crule} enregistre la clause \texttt{lemma\_inst} à l'emplacement \texttt{p} de l'état. On peut facilement prouver que \texttt{lemma\_inst} est valide, et même indépen\-damment des clauses contenues par l'état. En effet, il suffit d'appliquer \texttt{pinstanc} à \texttt{plemma}. On a donc rétabli la preuve du théorème de correction.\medbreak
 
