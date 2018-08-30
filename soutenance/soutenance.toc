@@ -1,0 +1,4 @@
+\babel@toc {english}{}
+\beamer@sectionintoc {1}{M\IeC {\'e}thodes formelles}{2}{0}{1}
+\beamer@sectionintoc {2}{SMTCoq}{6}{0}{2}
+\beamer@sectionintoc {3}{Ajout de lemmes quantifi\IeC {\'e}s}{16}{0}{3}

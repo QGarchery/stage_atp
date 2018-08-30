@@ -1,0 +1,89 @@
+\begin{thebibliography}{10}
+
+\bibitem{smtcoq_code}
+Michael Armand, Germain Faure, Benjamin Gr{\'e}goire, Chantal Keller, Laurent
+  Th{\'e}ry, and Benjamin Werner.
+\newblock A modular integration of sat/smt solvers to coq through proof
+  witnesses.
+\newblock In Jean-Pierre Jouannaud and Zhong Shao, editors, {\em Certified
+  Programs and Proofs}, pages 135--150, Berlin, Heidelberg, 2011. Springer
+  Berlin Heidelberg.
+
+\bibitem{native-coq}
+Micha{\"{e}}l Armand, Benjamin Gr{\'{e}}goire, Arnaud Spiwack, and Laurent
+  Th{\'{e}}ry.
+\newblock Extending coq with imperative features and its application to {SAT}
+  verification.
+\newblock In {\em Interactive Theorem Proving, First International Conference,
+  {ITP} 2010, Edinburgh, UK, July 11-14, 2010. Proceedings}, pages 83--98,
+  2010.
+
+\bibitem{smtlib}
+Clark Barrett, Pascal Fontaine, and Cesare Tinelli.
+\newblock {The SMT-LIB Standard: Version 2.6}.
+\newblock Technical report, Department of Computer Science, The University of
+  Iowa, 2017.
+\newblock Available at {\tt www.SMT-LIB.org}.
+
+\bibitem{hol_selector}
+Jasmin~Christian Blanchette, David Greenaway, Cezary Kaliszyk, Daniel
+  K{\"{u}}hlwein, and Josef Urban.
+\newblock A learning-based fact selector for isabelle/hol.
+\newblock {\em J. Autom. Reasoning}, 57(3):219--244, 2016.
+
+\bibitem{sledgehammer_manual}
+Jasmin Christian~Blanchette and Lawrence~C. Paulson.
+\newblock {\em Hammering Away, A User’s Guide to Sledgehammer for
+  Isabelle/HOL}, 2017.
+
+\bibitem{coqhammer}
+Lukasz Czajka and Cezary Kaliszyk.
+\newblock Hammer for coq: Automation for dependent type theory.
+\newblock {\em J. Autom. Reasoning}, 61(1-4):423--453, 2018.
+
+\bibitem{why3_intro}
+Jean{-}Christophe Filli{\^{a}}tre and Andrei Paskevich.
+\newblock Why3 - where programs meet provers.
+\newblock In {\em Programming Languages and Systems - 22nd European Symposium
+  on Programming, {ESOP} 2013, Held as Part of the European Joint Conferences
+  on Theory and Practice of Software, {ETAPS} 2013, Rome, Italy, March 16-24,
+  2013. Proceedings}, pages 125--128, 2013.
+
+\bibitem{ssreflect}
+Georges Gonthier, Assia Mahboubi, and Enrico Tassi.
+\newblock {A Small Scale Reflection Extension for the Coq system}.
+\newblock Research Report RR-6455, {Inria Saclay Ile de France}, 2016.
+
+\bibitem{these_keller}
+Chantal Keller.
+\newblock {\em A Matter of Trust: Skeptical Communication Between Coq and
+  External Provers. (Question de confiance : communication sceptique entre Coq
+  et des prouveurs externes)}.
+\newblock PhD thesis, {\'{E}}cole Polytechnique, Palaiseau, France, 2013.
+
+\bibitem{compcert}
+Xavier Leroy.
+\newblock Formal verification of a realistic compiler.
+\newblock {\em Commun. {ACM}}, 52(7):107--115, 2009.
+
+\bibitem{smt_autarcique}
+St{\'{e}}phane Lescuyer.
+\newblock {\em Formalizing and Implementing a Reflexive Tactic for Automated
+  Deduction in Coq. (Formalisation et developpement d'une tactique reflexive
+  pour la demonstration automatique en coq)}.
+\newblock PhD thesis, University of Paris-Sud, Orsay, France, 2011.
+
+\bibitem{dpll}
+Robert Nieuwenhuis, Albert Oliveras, and Cesare Tinelli.
+\newblock Solving {SAT} and {SAT} modulo theories: From an abstract
+  davis--putnam--logemann--loveland procedure to dpll(\emph{T}).
+\newblock {\em J. {ACM}}, 53(6):937--977, 2006.
+
+\bibitem{coq_intro}
+Christine Paulin-Mohring.
+\newblock {Introduction to the Calculus of Inductive Constructions}.
+\newblock In Bruno~Woltzenlogel Paleo and David Delahaye, editors, {\em {All
+  about Proofs, Proofs for All}}, volume~55 of {\em Studies in Logic
+  (Mathematical logic and foundations)}. {College Publications}, January 2015.
+
+\end{thebibliography}
