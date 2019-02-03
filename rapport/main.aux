@@ -35,18 +35,18 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.3}Int\IeC {\'e}r\IeC {\^e}t et exemple d'utilisation}{6}}
 \newlabel{interet_reification}{{3.2.3}{6}}
 \citation{dpll}
+\citation{smtlib}
 \@writefile{toc}{\contentsline {section}{\numberline {4}Prouveurs automatiques}{7}}
 \newlabel{fonctionnement_prouveurs}{{4}{7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Utilisation par SMTCoq}{7}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Prouveurs SMT}{7}}
 \newlabel{smt}{{4.2}{7}}
-\citation{smtlib}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Format d'entr\IeC {\'e}e, le langage SMT-LIB}{8}}
 \newlabel{smt-lib}{{4.3}{8}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Format de sortie, les certificats de veriT}{8}}
 \newlabel{sortie}{{4.4}{8}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.1}R\IeC {\`e}gle $input$}{8}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.2}R\IeC {\`e}gle $resolution$}{9}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.2}R\IeC {\`e}gle $resolution$}{8}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {4.4.3}R\IeC {\`e}gles $not\_implies0$ et $not\_implies1$}{9}}
 \newlabel{not_implies}{{4.4.3}{9}}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Pr\IeC {\'e}sentation de SMTCoq}{9}}
@@ -55,20 +55,20 @@
 \newlabel{sceptique_autarcique}{{5.1}{9}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Fonctionnement de SMTCoq}{10}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Am\IeC {\'e}lioration de l'automatisation}{10}}
-\newlabel{negation}{{5.2.1}{10}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Am\IeC {\'e}lioration de la confiance}{11}}
-\newlabel{confiance}{{5.2.2}{11}}
+\newlabel{smtcoq_automatisation}{{5.2.1}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Am\IeC {\'e}lioration de la confiance}{10}}
+\newlabel{smtcoq_confiance}{{5.2.2}{10}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}Cas d'application de SMTCoq}{11}}
 \newlabel{cas_application}{{5.2.3}{11}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Utilisation de SMTCoq}{11}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}La tactique \texttt  {verit}}{11}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}La commande de reconstruction}{11}}
 \citation{smtcoq_code}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}La commande de reconstruction}{12}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Transformation de certificats}{12}}
 \newlabel{transformation_certif}{{6}{12}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Des certificats de toutes les couleurs}{12}}
 \newlabel{des_certificats}{{6.1}{12}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Transformation de Tseitin et \textit  {hash-consing}}{12}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Transformation de Tseitin et \textit  {hash consing}}{12}}
 \newlabel{tseitin}{{6.2}{12}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.1}Motivations}{12}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.2}Fonctionnement}{12}}
@@ -81,23 +81,25 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.4}Preuve du th\IeC {\'e}or\IeC {\`e}me de correction}{14}}
 \newlabel{preuve_correction}{{6.3.4}{14}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.3.5}Exemple de l'identit\IeC {\'e}}{14}}
+\newlabel{id_exemple}{{6.3.5}{14}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Le pr\IeC {\'e}processeur}{14}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.1}Le type OCaml \textit  {orule}}{14}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {6.4.2}Allocation dans le tableau d'\IeC {\'e}tat}{15}}
 \newlabel{alloc}{{6.4.2}{15}}
 \@writefile{toc}{\contentsline {section}{\numberline {7}Pr\IeC {\'e}processeur pour les lemmes quantifi\IeC {\'e}s}{15}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Instanciation d'un lemme par veriT: la r\IeC {\`e}gle $forall\_inst$}{15}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Lier une instanciation \IeC {\`a} un lemme}{15}}
-\newlabel{lien}{{7.2}{15}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1}Lien entre une r\IeC {\`e}gle $forall\_inst$ et une r\IeC {\`e}gle $input$}{15}}
-\newlabel{lien_parsing}{{7.2.1}{15}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.2}Lien entre une formule et un lemme Coq}{16}}
-\newlabel{lien_formule_lemme}{{7.2.2}{16}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Logique de veriT et de Coq}{16}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}La r\IeC {\`e}gle $same$}{17}}
+\newlabel{forall_inst}{{7.1}{15}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}\textit  {Parsing} des certificats}{15}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Lier une instanciation \IeC {\`a} un lemme}{16}}
+\newlabel{lien}{{7.3}{16}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.3.1}Lien entre une r\IeC {\`e}gle $forall\_inst$ et une r\IeC {\`e}gle $input$}{16}}
+\newlabel{lien_parsing}{{7.3.1}{16}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.3.2}Lien entre une formule du certificat et un lemme Coq}{16}}
+\newlabel{lien_formule_lemme}{{7.3.2}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Difficult\IeC {\'e}s li\IeC {\'e}es \IeC {\`a} la traduction de la r\IeC {\`e}gle $forall\_inst$}{16}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Modifier le r\IeC {\'e}sultat de la r\IeC {\`e}gle $forall\_inst$}{17}}
 \newlabel{processing_forallinst}{{7.5}{17}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}Une application: les r\IeC {\`e}gles \textit  {input}}{17}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}Une application: les r\IeC {\`e}gles $input$}{17}}
 \@writefile{toc}{\contentsline {section}{\numberline {8}V\IeC {\'e}rificateur pour les lemmes quantifi\IeC {\'e}s}{18}}
 \newlabel{instanciations}{{8}{18}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {8.1}La \textit  {crule} \texttt  {Forallinst}}{18}}

@@ -53,6 +53,8 @@ sensitive=true,
 \begin{document}
 
 
+
+
 \maketitle
 \thispagestyle{empty}
 
@@ -119,7 +121,7 @@ Les formules acceptées par SMTCoq doivent être exprimées dans le type des boo
 
 On pourrait aussi utiliser des méthodes de \textit{machine learning} pour sélectionner les lemmes à envoyer au prouveur automatique comme c'est fait dans Coqhammer et Sledgehammer \cite{hol_selector, coqhammer}. L'avantage étant qu'avec des lemmes pertinents et en petit nombre le prouveur automatique trouve plus rapidement et plus souvent la preuve du théorème en question.
 
-Un autre but que l'on souhaite poursuivre est la certification du logiciel de vérification Why3 \cite{why3_intro}. Puisque Why3 utilise des prouveurs automatiques, cela nécessite de certifier les démonstrations faites par ces prouveurs. Ce sujet est au c\oe ur de celui de ma thèse intitulée "Certification de la génération et la transformation d'obligations de preuves" qui sera encadrée par Claude Marché, Chantal Keller et Andrei Paskevich. À cette occasion, j'utiliserai SMTCoq et je profiterai de l'amélioration de son expressivité due à mon stage. Je pourrai l'améliorer encore en étendant le format des lemmes que l'on peut transmettre à SMTCoq. \medbreak
+Un autre but que l'on souhaite poursuivre est la certification du logiciel de vérification Why3 \cite{why3_intro}. Puisque Why3 utilise des prouveurs automatiques, cela nécessite de certifier les démonstrations faites par ces prouveurs. Ce sujet est au c\oe ur de celui de ma thèse intitulée "Certification de la génération et de la transformation d'obligations de preuves" qui sera encadrée par Claude Marché, Chantal Keller et Andrei Paskevich. À cette occasion, j'utiliserai SMTCoq et je profiterai de l'amélioration de son expressivité due à mon stage. Je pourrai l'améliorer encore en étendant le format des lemmes que l'on peut transmettre à SMTCoq. \medbreak
 
 Ces améliorations de l'expressivité et de l'efficacité combinées avec la facilité d'utilisation et la robustesse de SMTCoq ont pour objectifs d'en faire un outil accessible et de généraliser son utilisation dans les projets développés en Coq.
 
@@ -155,7 +157,7 @@ Les fragments de code Coq fournis sont encadrés et sont compilables lorsqu'ils 
 \end{lstlisting}
 Cela requiert l'installation de SMTCoq, la version contenant ma contribution est disponible à l'adresse:
 \begin{align*}
-    \texttt{https://github.com/QGarchery/smtcoq-1}
+    \texttt{https://github.com/QGarchery/smtcoq-1/tree/end\char`_of\char`_internship}
 \end{align*}
 On préférera la version utilisant native-coq \cite{native-coq} pour des raisons d'efficacité.
 
@@ -548,7 +550,7 @@ Sur le type des clauses, SMTCoq définit une fonction \texttt{interp} qui invers
 
 On dit qu'une clause est valide lorsque son interprétation est vraie. La preuve du théorème de correction utilise la proposition \texttt{step\_checker\_correct} qui s'énonce ainsi: si toutes les clauses du tableau d'état sont valides alors une étape de \texttt{checker} modifie ce tableau en un tableau dont toutes les clauses sont valides. Il suffit en fait de vérifier que la nouvelle clause générée par \texttt{checker} est valide. \medbreak
 
-À partir de cette proposition on démontre le théorème de correction. Donnons les grandes étapes de la preuve de ce théorème. Pour prouver $\texttt{checker cc t = true -> negb (interp cl)}$, on suppose \texttt{interp cl} et \texttt{checker cc t = true}. Initialement, l'état ne contient donc que des clauses valides (tous les emplacements du tableau contiennent \texttt{cl}). D'après \texttt{step\_checker\_correct}, cette propriété est conservée par la fonction \texttt{checker}. Si de plus \texttt{checker} renvoie \texttt{true} cela veut dire qu'il y a la clause vide dans le dernier tableau d'état. L'interprétation de la clause vide nous conduit à une contradiction.
+À partir de cette proposition on démontre le théorème de correction. Donnons les grandes étapes de la preuve de ce théorème. Pour prouver $\texttt{checker cc t = true -> negb (interp cl)}$, on suppose \texttt{interp cl} et \texttt{checker cc t = true}. Initialement, l'état ne contient donc que des clauses valides (tous les emplacements du tableau contiennent \texttt{cl}). D'après \texttt{step\_checker\_correct}, cette propriété est conservée par la fonction \texttt{checker}. Puisque \texttt{checker cc t = true}, on sait que le dernier tableau d'état contient la clause vide. L'interprétation de cette clause nous conduit à une contradiction.
 
 
 \subsubsection{Exemple de l'identité} \label{id_exemple}
@@ -756,7 +758,7 @@ Plus généralement, lorsqu'on veut rajouter les lemmes prouvés par \texttt{H1}
 
 On définit la tactique \texttt{verit} comme \texttt{verit\_base; vauto} ce qui nous permet de conserver le comportement de cette tactique par rapport à la version antérieure de SMTCoq lorsque l'on n'utilise pas de lemmes supplémentaires. On définit également une liste qui sera toujours ajoutée à \texttt{verit\_base}. Initialement cette liste est vide mais la commande \texttt{Add\_lemmas H1\,...\,Hn} la concatène avec \texttt{H1}, ...,\texttt{Hn}. Pour finir la commande \texttt{Clear\_lemmas} réinitialise la liste. 
 
-Le dépôt Git \texttt{github.com/QGarchery/smtcoq-1} contient d'autres exemples donnés dans les fichiers \texttt{examples/Example.v} et \texttt{unit-tests/Tests\_verit.v}.
+La branche \texttt{end\char`_of\char`_internship} du dépôt Git \texttt{github.com/QGarchery/smtcoq-1} contient d'autres exemples donnés dans les fichiers \texttt{examples/Example.v} et \texttt{unit-tests/Tests\_verit.v}.
 
 
 \section{Travaux connexes et conclusion}
